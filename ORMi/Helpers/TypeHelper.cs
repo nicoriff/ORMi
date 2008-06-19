@@ -63,22 +63,27 @@ namespace ORMi.Helpers
 
             foreach (PropertyInfo p in o.GetType().GetProperties())
             {
-                WMIProperty propAtt = p.GetCustomAttribute<WMIProperty>();
+                WMIIgnore ignoreProp = p.GetCustomAttribute<WMIIgnore>();
 
-                string propertyName = String.Empty;
-
-                if (propAtt != null)
+                if (ignoreProp == null)
                 {
-                    propertyName = propAtt.Name;
-                }
-                else
-                {
-                    propertyName = p.Name;
-                }
+                    WMIProperty propAtt = p.GetCustomAttribute<WMIProperty>();
 
-                var a = mo.Properties[propertyName].Value;
+                    string propertyName = String.Empty;
 
-                p.SetValue(o, Convert.ChangeType(a, p.PropertyType), null);
+                    if (propAtt != null)
+                    {
+                        propertyName = propAtt.Name;
+                    }
+                    else
+                    {
+                        propertyName = p.Name;
+                    }
+
+                    var a = mo.Properties[propertyName].Value;
+
+                    p.SetValue(o, Convert.ChangeType(a, p.PropertyType), null);
+                }
             }
 
             return o;
@@ -157,19 +162,24 @@ namespace ORMi.Helpers
 
             foreach (PropertyInfo propertyInfo in p.GetType().GetProperties())
             {
-                WMIProperty propAtt = propertyInfo.GetCustomAttribute<WMIProperty>();
+                WMIIgnore ignoreProp = propertyInfo.GetCustomAttribute<WMIIgnore>();
 
-                if (propAtt != null)
+                if (ignoreProp == null)
                 {
-                    if (propAtt.SearchKey)
-                    {
-                        res = new WMISearchKey
-                        {
-                            Name = propAtt.Name,
-                            Value = propertyInfo.GetValue(p)
-                        };
+                    WMIProperty propAtt = propertyInfo.GetCustomAttribute<WMIProperty>();
 
-                        break;
+                    if (propAtt != null)
+                    {
+                        if (propAtt.SearchKey)
+                        {
+                            res = new WMISearchKey
+                            {
+                                Name = propAtt.Name,
+                                Value = propertyInfo.GetValue(p)
+                            };
+
+                            break;
+                        }
                     }
                 }
             }

@@ -17,5 +17,8 @@ namespace ORMi.Sample.Models
 
         [WMIProperty("PRIMARYSEGMENTID")]
         public int Segment { get; set; }
+
+        [WMIIgnore]
+        public int Age { get; set; }
     }
 }

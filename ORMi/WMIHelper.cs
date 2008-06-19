@@ -70,15 +70,20 @@ namespace ORMi
                     {
                         foreach (PropertyInfo p in obj.GetType().GetProperties())
                         {
-                            WMIProperty propAtt = p.GetCustomAttribute<WMIProperty>();
+                            WMIIgnore ignoreProp = p.GetCustomAttribute<WMIIgnore>();
 
-                            if (propAtt != null)
+                            if (ignoreProp == null)
                             {
-                                m[propAtt.Name] = p.GetValue(obj);
-                            }
-                            else
-                            {
-                                m[p.Name] = p.GetValue(obj);
+                                WMIProperty propAtt = p.GetCustomAttribute<WMIProperty>();
+
+                                if (propAtt != null)
+                                {
+                                    m[propAtt.Name] = p.GetValue(obj);
+                                }
+                                else
+                                {
+                                    m[p.Name] = p.GetValue(obj);
+                                }
                             }
                         }
 
@@ -173,7 +178,7 @@ namespace ORMi
         /// <summary>
         /// Remove a WMI Instance based on a custom query.
         /// </summary>
-        /// <param name="query">Query that returns the object to be removed</param>
+        /// <param name="query">Query that returns the objects to be removed</param>
         public void RemoveInstance(string query)
         {
             try
