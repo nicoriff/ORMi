@@ -11,14 +11,24 @@ namespace ORMi.Sample
     {
         static void Main(string[] args)
         {
-            WMIHelper helper = new WMIHelper("root\\CimV2");
+            WMIHelper helper = new WMIHelper("root\\OnGuard");
 
-            List<Process> processes = helper.Query<Process>().ToList();
-
-            foreach (Process p in processes)
+            Output outp = new Output
             {
-                p.GetOwner();
-            }
+                PanelID = 10,
+                ReaderID = 1,
+                Hostname = "VLABA-ONGUARD01",
+                Name = "VLABA-ONGUARD01"
+            };
+
+            outp.Activate();
+
+            //List<Process> processes = helper.Query<Process>().ToList();
+
+            //foreach (Process p in processes)
+            //{
+            //    p.GetOwner();
+            //}
 
             //new TestClass().DoSomething();
 
