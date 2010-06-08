@@ -33,7 +33,15 @@ namespace ORMi.Sample
 
             List<Person> queryPerson = helper.Query<Person>("SELECT * FROM Lnl_Cardholder WHERE LASTNAME = 'Lopez'").ToList();
 
+            WMIWatcher watcher = new WMIWatcher("root\\OnGuard", "SELECT * FROM Lnl_AccessEvent", typeof(Registry));
+            watcher.WMIEventArrived += Watcher_WMIEventArrived;
+
             Console.ReadLine();
+        }
+
+        private static void Watcher_WMIEventArrived(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
         }
     }
 }

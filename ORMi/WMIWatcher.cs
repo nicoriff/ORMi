@@ -11,25 +11,28 @@ namespace ORMi
 {
     public class WMIWatcher
     {
+        ManagementEventWatcher watcher;
+        private string _scope;
         private string _query;
         private Type _type;
 
-        public WMIWatcher(string query, Type type)
+        public WMIWatcher(string scope, string query, Type type)
         {
+            _scope = scope;
             _query = query;
             _type = type;
 
-            CreateWatcher(query);
+            CreateWatcher();
         }
 
         /// <summary>
         /// Create a WMI Event Watcher
         /// </summary>
-        /// <param name="query">Query that will start the watch for events</param>
-        private void CreateWatcher(string query)
+        private void CreateWatcher()
         {
-            ManagementEventWatcher watcher = new ManagementEventWatcher(query);
+            watcher = new ManagementEventWatcher(_scope, _query);
             watcher.EventArrived += Watcher_EventArrived;
+            watcher.Start();
         }
 
         private void Watcher_EventArrived(object sender, EventArrivedEventArgs e)

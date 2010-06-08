@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="Models\Person.cs" />
     <Compile Include="Models\Processor.cs" />
+    <Compile Include="Models\Registry.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
