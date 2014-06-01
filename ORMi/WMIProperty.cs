@@ -23,6 +23,10 @@ namespace ORMi
 
     public class WMIClass : Attribute
     {
+        public WMIClass()
+        {
+
+        }
         public WMIClass(string name)
         {
             Name = name;

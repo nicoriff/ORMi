@@ -44,8 +44,6 @@ namespace ORMi
 
                 string className = GetClassName(obj);
 
-                ManagementObject updatedObject = GetManagementObject(new ManagementClass(Scope, GetClassName(obj), null), obj);
-
                 WMISearchKey key = GetSearchKey(obj);
 
                 if (key.Value != null)
@@ -62,9 +60,18 @@ namespace ORMi
 
                     foreach (ManagementObject m in searcher.Get())
                     {
-                        foreach (PropertyData p in m.Properties)
+                        foreach (PropertyInfo p in obj.GetType().GetProperties())
                         {
-                            p.Value = updatedObject.Properties[p.Name].Value;
+                            WMIProperty propAtt = p.GetCustomAttribute<WMIProperty>();
+
+                            if (propAtt != null)
+                            {
+                                m[propAtt.Name] = p.GetValue(obj);
+                            }
+                            else
+                            {
+                                m[p.Name] = p.GetValue(obj);
+                            }
                         }
 
                         m.Put();
@@ -183,7 +190,18 @@ namespace ORMi
             {
                 WMIProperty propAtt = p.GetCustomAttribute<WMIProperty>();
 
-                var a = mo.Properties[propAtt.Name].Value;
+                string propertyName = String.Empty;
+
+                if (propAtt != null)
+                {
+                    propertyName = propAtt.Name;
+                }
+                else
+                {
+                    propertyName = p.Name;
+                }
+
+                var a = mo.Properties[propertyName].Value;
 
                 p.SetValue(o, Convert.ChangeType(a, p.PropertyType), null);
             }
@@ -230,22 +248,22 @@ namespace ORMi
                 {
                     if (propertyInfo.GetValue(obj).GetType() == typeof(DateTime))
                     {
-                        genericInstance[propertyInfo.Name] = ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(propertyInfo.GetValue(obj)));
+                        genericInstance[propertyInfo.Name.ToUpper()] = ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(propertyInfo.GetValue(obj)));
                     }
                     else
                     {
-                        genericInstance[propertyInfo.Name] = propertyInfo.GetValue(obj);
+                        genericInstance[propertyInfo.Name.ToUpper()] = propertyInfo.GetValue(obj);
                     }
                 }
                 else
                 {
                     if (propertyInfo.GetValue(obj).GetType() == typeof(DateTime))
                     {
-                        genericInstance[propAtt.Name] = ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(propertyInfo.GetValue(obj)));
+                        genericInstance[propAtt.Name.ToUpper()] = ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(propertyInfo.GetValue(obj)));
                     }
                     else
                     {
-                        genericInstance[propAtt.Name] = propertyInfo.GetValue(obj);
+                        genericInstance[propAtt.Name.ToUpper()] = propertyInfo.GetValue(obj);
                     }
                 }
             }
