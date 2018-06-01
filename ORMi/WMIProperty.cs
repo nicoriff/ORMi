@@ -18,7 +18,6 @@ namespace ORMi
         }
 
         public string Name { get; set; }
-        public Type Type { get; set; }
         public Boolean SearchKey { get; set; }
     }
 

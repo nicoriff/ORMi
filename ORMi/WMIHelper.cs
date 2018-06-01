@@ -26,21 +26,7 @@ namespace ORMi
 
                 ManagementClass genericClass = new ManagementClass(Scope, GetClassName(obj), null);
 
-                ManagementObject genericInstance = genericClass.CreateInstance();
-
-                Dictionary<string, object> properties = GetPropertiesDictionary(obj);
-
-                foreach (KeyValuePair<string, object> value in properties)
-                {
-                    if (value.Value.GetType() == typeof(DateTime))
-                    {
-                        genericInstance[value.Key] = ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(value.Value));
-                    }
-                    else
-                    {
-                        genericInstance[value.Key] = value.Value.ToString();
-                    }
-                }
+                ManagementObject genericInstance = GetManagementObject(genericClass, obj);
 
                 genericInstance.Put();
             }
@@ -57,26 +43,32 @@ namespace ORMi
                 WindowsImpersonationContext impersonatedUser = WindowsIdentity.GetCurrent().Impersonate();
 
                 string className = GetClassName(obj);
-                Dictionary<string, object> properties = GetPropertiesDictionary(obj);
 
-                KeyValuePair<string, object> onGuardKey = GetSearchKey(obj);
+                ManagementObject updatedObject = GetManagementObject(new ManagementClass(Scope, GetClassName(obj), null), obj);
 
-                string query = String.Format("SELECT * FROM {0} WHERE {1} = '{2}'", className, onGuardKey.Key, onGuardKey.Value);
+                WMISearchKey key = GetSearchKey(obj);
 
-                ManagementObjectSearcher searcher;
-                searcher = new ManagementObjectSearcher(Scope, query);
-
-                EnumerationOptions options = new EnumerationOptions();
-                options.ReturnImmediately = true;
-
-                foreach (ManagementObject m in searcher.Get())
+                if (key.Value != null)
                 {
-                    foreach (KeyValuePair<string, object> k in properties)
-                    {
-                        m.Properties[k.Key].Value = k.Value;
-                    }
+                    string query = String.Format("SELECT * FROM {0} WHERE {1} = '{2}'", GetClassName(obj), key.Name, key.Value);
 
-                    m.Put();
+                    ManagementObjectSearcher searcher;
+                    searcher = new ManagementObjectSearcher(Scope, query);
+
+                    EnumerationOptions options = new EnumerationOptions();
+                    options.ReturnImmediately = true;
+
+                    ManagementObjectCollection col = searcher.Get();
+
+                    foreach (ManagementObject m in searcher.Get())
+                    {
+                        foreach (PropertyData p in m.Properties)
+                        {
+                            p.Value = updatedObject.Properties[p.Name].Value;
+                        }
+
+                        m.Put();
+                    }
                 }
             }
             catch (Exception ex)
@@ -93,9 +85,9 @@ namespace ORMi
 
                 string className = GetClassName(obj);
 
-                KeyValuePair<string, object> onGuardKey = GetSearchKey(obj);
+                WMISearchKey key = GetSearchKey(obj);
 
-                string query = String.Format("SELECT * FROM {0} WHERE {1} = '{2}'", className, onGuardKey.Key, onGuardKey.Value);
+                string query = String.Format("SELECT * FROM {0} WHERE {1} = '{2}'", className, key.Name, key.Value);
 
                 ManagementObjectSearcher searcher;
                 searcher = new ManagementObjectSearcher(Scope, query);
@@ -199,30 +191,6 @@ namespace ORMi
             return o;
         }
 
-        public Dictionary<string, object> GetPropertiesDictionary(object p)
-        {
-            Dictionary<string, object> dic = new Dictionary<string, object>();
-
-            foreach (PropertyInfo propertyInfo in p.GetType().GetProperties())
-            {
-                WMIProperty propAtt = propertyInfo.GetCustomAttribute<WMIProperty>();
-
-                if (propAtt != null)
-                {
-                    if (propAtt.Type == typeof(DateTime))
-                    {
-                        dic.Add(propAtt.Name, ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(propertyInfo.GetValue(p))));
-                    }
-                    else
-                    {
-                        dic.Add(propAtt.Name, propertyInfo.GetValue(p));
-                    }
-                }
-            }
-
-            return dic;
-        }
-
         public string GetClassName(object p)
         {
             var dnAttribute = p.GetType().GetCustomAttributes(
@@ -232,7 +200,10 @@ namespace ORMi
             {
                 return dnAttribute.Name;
             }
-            return null;
+            else
+            {
+                return p.GetType().Name;
+            }
         }
 
         public string GetClassName(Type t)
@@ -247,9 +218,44 @@ namespace ORMi
             return null;
         }
 
-        public KeyValuePair<string, object> GetSearchKey(object p)
+        private ManagementObject GetManagementObject(ManagementClass sourceClass, object obj)
         {
-            KeyValuePair<string, object> res = new KeyValuePair<string, object>();
+            ManagementObject genericInstance = sourceClass.CreateInstance();
+
+            foreach (PropertyInfo propertyInfo in obj.GetType().GetProperties())
+            {
+                WMIProperty propAtt = propertyInfo.GetCustomAttribute<WMIProperty>();
+
+                if (propAtt == null)
+                {
+                    if (propertyInfo.GetValue(obj).GetType() == typeof(DateTime))
+                    {
+                        genericInstance[propertyInfo.Name] = ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(propertyInfo.GetValue(obj)));
+                    }
+                    else
+                    {
+                        genericInstance[propertyInfo.Name] = propertyInfo.GetValue(obj);
+                    }
+                }
+                else
+                {
+                    if (propertyInfo.GetValue(obj).GetType() == typeof(DateTime))
+                    {
+                        genericInstance[propAtt.Name] = ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(propertyInfo.GetValue(obj)));
+                    }
+                    else
+                    {
+                        genericInstance[propAtt.Name] = propertyInfo.GetValue(obj);
+                    }
+                }
+            }
+
+            return genericInstance;
+        }
+
+        public WMISearchKey GetSearchKey(object p)
+        {
+            WMISearchKey res = null;
 
             foreach (PropertyInfo propertyInfo in p.GetType().GetProperties())
             {
@@ -259,7 +265,12 @@ namespace ORMi
                 {
                     if (propAtt.SearchKey)
                     {
-                        res = new KeyValuePair<string, object>(propAtt.Name, propertyInfo.GetValue(p));
+                        res = new WMISearchKey
+                        {
+                            Name = propAtt.Name,
+                            Value = propertyInfo.GetValue(p)
+                        };
+
                         break;
                     }
                 }
@@ -267,5 +278,11 @@ namespace ORMi
 
             return res;
         }
+    }
+
+    public class WMISearchKey
+    {
+        public string Name { get; set; }
+        public object Value { get; set; }
     }
 }
