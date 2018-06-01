@@ -11,17 +11,19 @@ namespace ORMi.Sample
     {
         static void Main(string[] args)
         {
-            WMIHelper helper = new WMIHelper("root\\onguard");
+            WMIHelper helper = new WMIHelper("root\\CimV2");
 
-            //Person person = new Person
-            //{
-            //    FirstName = "John",
-            //    Lastname = "Doe",
-            //    DocumentNumber = "9995",
-            //    Segment = -1
-            //};
+            List<Processor> processors = helper.Query<Processor>().ToList();
 
-            //helper.AddInstance(person);
+            Person person = new Person
+            {
+                FirstName = "John",
+                Lastname = "Doe",
+                DocumentNumber = "9995",
+                Segment = -1
+            };
+
+            helper.AddInstance(person);
 
             Person queryPersonSingle = helper.Query<Person>("SELECT * FROM Lnl_Cardholder WHERE LASTNAME = 'Doe'").SingleOrDefault();
 
