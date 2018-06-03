@@ -161,6 +161,31 @@ namespace ORMi
             return res;
         }
 
+        public Task<IEnumerable<T>> QueryAsync<T>()
+        {
+            List<T> res = new List<T>();
+
+            string nombre = GetClassName(typeof(T));
+
+            string query = String.Format("SELECT * FROM {0}", nombre);
+
+            ManagementObjectSearcher searcher;
+            searcher = new ManagementObjectSearcher(Scope, query);
+
+            EnumerationOptions options = new EnumerationOptions();
+            options.ReturnImmediately = true;
+
+            ManagementObjectCollection wmiRes = searcher.Get();
+
+            foreach (ManagementObject mo in wmiRes)
+            {
+                var a = (T)LoadObject(mo, typeof(T));
+                res.Add(a);
+            }
+
+            return Task.FromResult<IEnumerable<T>>(res);
+        }
+
         public IEnumerable<T> Query<T>(string query)
         {
             List<T> res = new List<T>();
