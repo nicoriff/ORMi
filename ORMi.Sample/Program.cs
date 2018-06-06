@@ -13,7 +13,7 @@ namespace ORMi.Sample
         {
             WMIHelper helper = new WMIHelper("root\\CimV2");
 
-            List<Processor> processors = helper.Query<Processor>().ToList();
+            var processors = helper.QueryAsync<Processor>();
 
             Person person = new Person
             {
