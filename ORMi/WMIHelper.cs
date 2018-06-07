@@ -20,6 +20,11 @@ namespace ORMi
         }
 
         #region CRUD Operations
+
+        /// <summary>
+        /// Adds a new WMI Instance
+        /// </summary>
+        /// <param name="obj">Object to add. The classname and properties or corresponding attributes will be maped to the corresponding WMI structure</param>
         public void AddInstance(object obj)
         {
             try
@@ -38,6 +43,10 @@ namespace ORMi
             }
         }
 
+        /// <summary>
+        /// Modifies an existing instance.
+        /// </summary>
+        /// <param name="obj">Object to update. ORMi will search the property with the SearchKey attribute. That value is going to be used to make the update.</param>
         public void UpdateInstance(object obj)
         {
             try
@@ -86,6 +95,56 @@ namespace ORMi
             }
         }
 
+        /// <summary>
+        /// Modifies an existing instance based on a custom query.
+        /// </summary>
+        /// <param name="obj">Object to be updated</param>
+        /// <param name="query">Query to be run against WMI. The resulting instances will be updated</param>
+        public void UpdateInstance(object obj, string query)
+        {
+            try
+            {
+                WindowsImpersonationContext impersonatedUser = WindowsIdentity.GetCurrent().Impersonate();
+
+                string className = TypeHelper.GetClassName(obj);
+
+                ManagementObjectSearcher searcher;
+                searcher = new ManagementObjectSearcher(Scope, query);
+
+                EnumerationOptions options = new EnumerationOptions();
+                options.ReturnImmediately = true;
+
+                ManagementObjectCollection col = searcher.Get();
+
+                foreach (ManagementObject m in searcher.Get())
+                {
+                    foreach (PropertyInfo p in obj.GetType().GetProperties())
+                    {
+                        WMIProperty propAtt = p.GetCustomAttribute<WMIProperty>();
+
+                        if (propAtt != null)
+                        {
+                            m[propAtt.Name] = p.GetValue(obj);
+                        }
+                        else
+                        {
+                            m[p.Name] = p.GetValue(obj);
+                        }
+                    }
+
+                    m.Put();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        /// <summary>
+        /// Remove a WMI instance.
+        /// </summary>
+        /// <param name="obj">Object to be removed.</param>
         public void RemoveInstance(object obj)
         {
             try
@@ -115,6 +174,10 @@ namespace ORMi
             }
         }
 
+        /// <summary>
+        /// Remove a WMI Instance based on a custom query.
+        /// </summary>
+        /// <param name="query">Query that returns the object to be removed</param>
         public void RemoveInstance(string query)
         {
             try
@@ -138,6 +201,11 @@ namespace ORMi
             }
         }
 
+        /// <summary>
+        /// Runs a query against WMI. It will return all instances of the class corresponding to the WMI class set on the Type on IEnumerable.
+        /// </summary>
+        /// <typeparam name="T">The Type of IEnumerable that will be returned</typeparam>
+        /// <returns></returns>
         public IEnumerable<T> Query<T>()
         {
             List<T> res = new List<T>();
@@ -163,11 +231,22 @@ namespace ORMi
             return res;
         }
 
+        /// <summary>
+        /// Runs an async query against WMI. It will return all instances of the class corresponding to the WMI class set on the Type on IEnumerable.
+        /// </summary>
+        /// <typeparam name="T">The Type of IEnumerable that will be returned</typeparam>
+        /// <returns></returns>
         public async Task<IEnumerable<T>> QueryAsync<T>()
         {
             return await Task.Run(() => Query<T>());
         }
 
+        /// <summary>
+        /// Runs a custom query against WMI.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="query">The Type of IEnumerable that will be returned</param>
+        /// <returns></returns>
         public IEnumerable<T> Query<T>(string query)
         {
             List<T> res = new List<T>();
@@ -189,11 +268,23 @@ namespace ORMi
             return res;
         }
 
+        /// <summary>
+        /// Runs an async query against WMI.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="query">The Type of IEnumerable that will be returned</param>
+        /// <returns></returns>
         public async Task<IEnumerable<T>> QueryAsync<T>(string query)
         {
             return await Task.Run(() => Query<T>(query));
         }
 
+        /// <summary>
+        /// Runs a custom query against WMI returning a single value.
+        /// </summary>
+        /// <typeparam name="T">The Type of IEnumerable that will be returned</typeparam>
+        /// <param name="query">Query to be run against WMI</param>
+        /// <returns></returns>
         public dynamic QuerySingle<T>(string query)
         {
             dynamic res = null;

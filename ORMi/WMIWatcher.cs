@@ -22,6 +22,10 @@ namespace ORMi
             CreateWatcher(query);
         }
 
+        /// <summary>
+        /// Create a WMI Event Watcher
+        /// </summary>
+        /// <param name="query">Query that will start the watch for events</param>
         private void CreateWatcher(string query)
         {
             ManagementEventWatcher watcher = new ManagementEventWatcher(query);

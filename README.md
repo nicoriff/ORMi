@@ -4,12 +4,21 @@ ORMi is a quite simple Light-ORM to work with WMI (Windows Management Instrument
 
 ## Getting Started
 
-Momentarily ORMi is not available via NuGet (It will be soon). But it will be available soon. Just clone the repo on GitHub or donwload the lastest version on: https://www.groovestudio.com.ar/ORMi.rar 
+Momentarily ORMi is not available via NuGet (It will be soon). You can download the latest release on https://github.com/nicoriff/ORMi/releases/.
+
+Once downloaded, you need to add the reference to the library on your project. 
 
 
 ## How to Use
 
-ORMi is just too easy to work with. Let큦 for example suppose we want to access 'root\CIMV2' namespace to get the some information about our computer proccesors. In that case, we큞l define the following class:
+ORMi is just too easy to work with. Let큦 for example suppose we want to access 'root\CIMV2' namespace to get the some information about our computer proccesors. 
+First of all, we need to use the library:
+
+```C# 
+using ORMi;
+```
+
+Then, we큞l define the following class:
 
 ```C#
     [WMIClass("Win32_Processor")]
