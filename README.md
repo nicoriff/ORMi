@@ -91,3 +91,49 @@ For the Update operation, the class must have the ```WmiProperty``` attribute de
 	
 In the above example, ORMi is going to look for the person with SSNO = 9995 and update that instance with the properties set on ```person``` instance.
 
+**Remove Instance:**
+
+As in the update operation, the removal works with the ```SearchKey``` property set or manually specifying a query. In both cases, the result will be removed:
+
+```C#
+	Person p = helper.Query<Person>("SELECT * FROM Lnl_Cardholder WHERE LASTNAME = 'Doe'").SingleOrDefault();
+	helper.RemoveInstance(p);
+```
+
+**Creating an WMI Event Watcher:**
+
+Creating a watcher is one of the simplest tasks in ORMi. Just declare the watcher specifying scope, query and the desired output type and that´s it!. Start receiving events!.
+In this example we are going to watch for new processes created on the system:
+
+First, we define the class:
+
+```C#
+    [WMIClass("Win32_ProcessStartTrace")]
+    public class Process
+    {
+        public string ProcessName { get; set; }
+        public int ProcessID { get; set; }
+    }
+```
+Then subscribe for events...
+
+```C#
+	WMIWatcher watcher = new WMIWatcher("root\\CimV2", "SELECT * FROM Win32_ProcessStartTrace", typeof(Process));
+	watcher.WMIEventArrived += Watcher_WMIEventArrived;
+```
+Or if you have WMIClass attribute set:
+
+```C#
+	WMIWatcher watcher = new WMIWatcher("root\\CimV2", typeof(Process));
+	watcher.WMIEventArrived += Watcher_WMIEventArrived;
+```
+And then, just handle the events...
+
+```C#
+    private static void Watcher_WMIEventArrived(object sender, WMIEventArgs e)
+    {
+        Process process = (Process)e.Object;
+
+        Console.WriteLine("New Process: {0} (Pid: {1})", process.ProcessName, process.ProcessID.ToString());
+    }
+```

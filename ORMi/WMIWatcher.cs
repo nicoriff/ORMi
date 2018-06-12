@@ -16,10 +16,33 @@ namespace ORMi
         private string _query;
         private Type _type;
 
+        public delegate void WMIEventHandler(object sender, WMIEventArgs e);
+        public event WMIEventHandler WMIEventArrived;
+
+        /// <summary>
+        /// Creates a WMI Event watcher based on custom query
+        /// </summary>
+        /// <param name="scope">Desired Scope</param>
+        /// <param name="query">Query to be watch</param>
+        /// <param name="type">Type of result</param>
         public WMIWatcher(string scope, string query, Type type)
         {
             _scope = scope;
             _query = query;
+            _type = type;
+
+            CreateWatcher();
+        }
+
+        /// <summary>
+        /// Creates a WMI Event watcher based on the WMIClass atribute that has been set to the desired Type
+        /// </summary>
+        /// <param name="scope">Desired Scope</param>
+        /// <param name="type">Query to be watch</param>
+        public WMIWatcher(string scope, Type type)
+        {
+            _scope = scope;
+            _query = String.Format("SELECT * FROM {0}", TypeHelper.GetClassName(type));
             _type = type;
 
             CreateWatcher();
@@ -41,8 +64,6 @@ namespace ORMi
 
             WMIEventArrived(this, new WMIEventArgs { Object = o });
         }
-
-        public event EventHandler WMIEventArrived;
     }
 
     public class WMIEventArgs : EventArgs

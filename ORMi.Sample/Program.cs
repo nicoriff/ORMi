@@ -13,35 +13,37 @@ namespace ORMi.Sample
         {
             WMIHelper helper = new WMIHelper("root\\CimV2");
 
-            var processors = helper.QueryAsync<Processor>();
+            //var processors = helper.QueryAsync<Processor>();
 
-            Person person = new Person
-            {
-                FirstName = "John",
-                Lastname = "Doe",
-                DocumentNumber = "9995",
-                Segment = -1
-            };
+            //Person person = new Person
+            //{
+            //    FirstName = "John",
+            //    Lastname = "Doe",
+            //    DocumentNumber = "9995",
+            //    Segment = -1
+            //};
 
-            helper.AddInstance(person);
+            //helper.AddInstance(person);
 
-            Person queryPersonSingle = helper.Query<Person>("SELECT * FROM Lnl_Cardholder WHERE LASTNAME = 'Doe'").SingleOrDefault();
+            //Person queryPersonSingle = helper.Query<Person>("SELECT * FROM Lnl_Cardholder WHERE LASTNAME = 'Doe'").SingleOrDefault();
 
-            queryPersonSingle.Lastname = "Doe Modified";
+            //queryPersonSingle.Lastname = "Doe Modified";
 
-            helper.UpdateInstance(queryPersonSingle);
+            //helper.UpdateInstance(queryPersonSingle);
 
-            List<Person> queryPerson = helper.Query<Person>("SELECT * FROM Lnl_Cardholder WHERE LASTNAME = 'Lopez'").ToList();
+            //List<Person> queryPerson = helper.Query<Person>("SELECT * FROM Lnl_Cardholder WHERE LASTNAME = 'Lopez'").ToList();
 
-            WMIWatcher watcher = new WMIWatcher("root\\OnGuard", "SELECT * FROM Lnl_AccessEvent", typeof(Registry));
+            WMIWatcher watcher = new WMIWatcher("root\\CimV2", "SELECT * FROM Win32_ProcessStartTrace", typeof(Process));
             watcher.WMIEventArrived += Watcher_WMIEventArrived;
 
             Console.ReadLine();
         }
 
-        private static void Watcher_WMIEventArrived(object sender, EventArgs e)
+        private static void Watcher_WMIEventArrived(object sender, WMIEventArgs e)
         {
-            throw new NotImplementedException();
+            Process process = (Process)e.Object;
+
+            Console.WriteLine("New Process: {0} (Pid: {1})", process.ProcessName, process.ProcessID.ToString());
         }
     }
 }
