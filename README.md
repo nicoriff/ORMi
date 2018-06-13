@@ -4,7 +4,7 @@ ORMi is a quite simple Light-ORM to work with WMI (Windows Management Instrument
 
 ## Getting Started
 
-Momentarily ORMi is not available via NuGet (It will be soon). You can download the latest release on https://github.com/nicoriff/ORMi/releases/.
+Momentarily ORMi is available via [NuGet](https://www.nuget.org/packages/ORMi/). Also, you can always download the latest release on https://github.com/nicoriff/ORMi/releases/.
 
 Once downloaded, you need to add the reference to the library on your project. 
 
