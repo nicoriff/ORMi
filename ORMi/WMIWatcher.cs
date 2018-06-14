@@ -20,6 +20,33 @@ namespace ORMi
         public event WMIEventHandler WMIEventArrived;
 
         /// <summary>
+        /// Creeates a WMI Watcher for the specified query. It returns a dynamic object.
+        /// </summary>
+        /// <param name="scope">Desired Scope</param>
+        /// <param name="query">Query to be watch</param>
+        public WMIWatcher(string scope, string query)
+        {
+            _scope = scope;
+            _query = query;
+
+            CreateWatcher();
+        }
+
+        /// <summary>
+        /// Creates a WMI Event watcher based on the WMIClass atribute that has been set to the desired Type
+        /// </summary>
+        /// <param name="scope">Desired Scope</param>
+        /// <param name="type">Type of object that will initiate the watch</param>
+        public WMIWatcher(string scope, Type type)
+        {
+            _scope = scope;
+            _query = String.Format("SELECT * FROM {0}", TypeHelper.GetClassName(type));
+            _type = type;
+
+            CreateWatcher();
+        }
+
+        /// <summary>
         /// Creates a WMI Event watcher based on custom query
         /// </summary>
         /// <param name="scope">Desired Scope</param>
@@ -29,20 +56,6 @@ namespace ORMi
         {
             _scope = scope;
             _query = query;
-            _type = type;
-
-            CreateWatcher();
-        }
-
-        /// <summary>
-        /// Creates a WMI Event watcher based on the WMIClass atribute that has been set to the desired Type
-        /// </summary>
-        /// <param name="scope">Desired Scope</param>
-        /// <param name="type">Query to be watch</param>
-        public WMIWatcher(string scope, Type type)
-        {
-            _scope = scope;
-            _query = String.Format("SELECT * FROM {0}", TypeHelper.GetClassName(type));
             _type = type;
 
             CreateWatcher();
@@ -60,9 +73,18 @@ namespace ORMi
 
         private void Watcher_EventArrived(object sender, EventArrivedEventArgs e)
         {
-            object o = TypeHelper.LoadObject(e.NewEvent, _type);
+            if (_type != null)
+            {
+                object o = TypeHelper.LoadObject(e.NewEvent, _type);
 
-            WMIEventArrived(this, new WMIEventArgs { Object = o });
+                WMIEventArrived(this, new WMIEventArgs { Object = o });
+            }
+            else
+            {
+                dynamic d = TypeHelper.LoadDynamicObject(e.NewEvent);
+
+                WMIEventArrived(this, new WMIEventArgs { Object = d });
+            }
         }
     }
 

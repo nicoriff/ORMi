@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Management;
 using System.Reflection;
@@ -35,6 +36,20 @@ namespace ORMi.Helpers
             }
 
             return o;
+        }
+
+        public static dynamic LoadDynamicObject(ManagementBaseObject mo)
+        {
+            dynamic res = new ExpandoObject();
+
+            var properties = (IDictionary<string, object>)res;
+
+            foreach (PropertyData p in mo.Properties)
+            {
+                properties.Add(p.Name, p.Value);
+            }
+
+            return res;
         }
 
         public static object LoadObject(ManagementBaseObject mo, Type t)
