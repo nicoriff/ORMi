@@ -202,6 +202,32 @@ namespace ORMi
         }
 
         /// <summary>
+        /// Runs a query against WMI. It will return a IEnumerable of dynamic type. No type mapping is done.
+        /// </summary>
+        /// <param name="query">Query to be run against WMI</param>
+        /// <returns></returns>
+        public IEnumerable<dynamic> Query(string query)
+        {
+            List<dynamic> res = new List<dynamic>();
+
+            ManagementObjectSearcher searcher;
+            searcher = new ManagementObjectSearcher(Scope, query);
+
+            EnumerationOptions options = new EnumerationOptions();
+            options.ReturnImmediately = true;
+
+            ManagementObjectCollection wmiRes = searcher.Get();
+
+            foreach (ManagementObject mo in wmiRes)
+            {
+                dynamic a = TypeHelper.LoadDynamicObject(mo);
+                res.Add(a);
+            }
+
+            return res;
+        }
+
+        /// <summary>
         /// Runs a query against WMI. It will return all instances of the class corresponding to the WMI class set on the Type on IEnumerable.
         /// </summary>
         /// <typeparam name="T">The Type of IEnumerable that will be returned</typeparam>
@@ -244,8 +270,8 @@ namespace ORMi
         /// <summary>
         /// Runs a custom query against WMI.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="query">The Type of IEnumerable that will be returned</param>
+        /// <typeparam name="T">The Type of IEnumerable that will be returned</typeparam>
+        /// <param name="query">Query to be run against WMI</param>
         /// <returns></returns>
         public IEnumerable<T> Query<T>(string query)
         {
@@ -271,8 +297,8 @@ namespace ORMi
         /// <summary>
         /// Runs an async query against WMI.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="query">The Type of IEnumerable that will be returned</param>
+        /// <typeparam name="T">The Type of IEnumerable that will be returned</typeparam>
+        /// <param name="query">Query to be run against WMI</param>
         /// <returns></returns>
         public async Task<IEnumerable<T>> QueryAsync<T>(string query)
         {
