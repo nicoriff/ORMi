@@ -11,39 +11,39 @@ namespace ORMi.Sample
     {
         static void Main(string[] args)
         {
-            WMIHelper helper = new WMIHelper("root\\OnGuard");
+            WMIHelper helper = new WMIHelper("root\\CimV2");
 
-            //var dynDevices = helper.Query("SELECT * FROM Win32_PnPEntity");
+            var dynDevices = helper.Query("SELECT * FROM Win32_PnPEntity");
 
-            //var processors = helper.Query<Processor>();
+            var processors = helper.Query<Processor>();
 
-            //List<Processor> procesors = helper.Query<Processor>().ToList();
+            List<Processor> procesors = helper.Query<Processor>().ToList();
 
-            //List<Device> devices = helper.Query<Device>().ToList()
-            //    .Where(p => (p.Name ?? "")
-            //    .Contains("Intel")).ToList();
+            List<Device> devices = helper.Query<Device>().ToList()
+                .Where(p => (p.Name ?? "")
+                .Contains("Intel")).ToList();
 
-            //foreach (Device d in devices)
-            //{
-            //    Console.WriteLine(d.Name);
-            //}
-
-            Person person = new Person
+            foreach (Device d in devices)
             {
-                FirstName = "John",
-                Lastname = "Doe",
-                DocumentNumber = "9995",
-                Segment = -1,
-                Age = 43
-            };
+                Console.WriteLine(d.Name);
+            }
 
-            helper.AddInstance(person);
+            //Person person = new Person
+            //{
+            //    FirstName = "John",
+            //    Lastname = "Doe",
+            //    DocumentNumber = "9995",
+            //    Segment = -1,
+            //    Age = 43
+            //};
 
-            Person queryPersonSingle = helper.Query<Person>("SELECT * FROM Lnl_Cardholder WHERE LASTNAME = 'Doe Modified'").SingleOrDefault();
+            //helper.AddInstance(person);
 
-            queryPersonSingle.Lastname = "Doe Modified";
+            //Person queryPersonSingle = helper.Query<Person>("SELECT * FROM Lnl_Cardholder WHERE LASTNAME = 'Doe Modified'").SingleOrDefault();
 
-            helper.UpdateInstance(queryPersonSingle);
+            //queryPersonSingle.Lastname = "Doe Modified";
+
+            //helper.UpdateInstance(queryPersonSingle);
 
             //List<Person> queryPerson = helper.Query<Person>("SELECT * FROM Lnl_Cardholder WHERE LASTNAME = 'Lopez'").ToList();
 
