@@ -2,11 +2,11 @@
 <package >
   <metadata>
     <id>ORMi</id>
-    <version>1.0.1</version>
+    <version>1.2.1</version>
     <title>ORMi</title>
     <authors>nicoriff</authors>
     <owners>nicoriff</owners>
-    <licenseUrl>https://github.com/nicoriff/ormi</licenseUrl>
+    <licenseUrl>https://github.com/nicoriff/ORMi/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/nicoriff/ormi</projectUrl>
     <iconUrl>https://www.shareicon.net/data/128x128/2017/02/07/878478_key_512x512.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>

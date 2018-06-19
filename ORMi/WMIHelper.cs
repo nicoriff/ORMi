@@ -64,9 +64,6 @@ namespace ORMi
                     ManagementObjectSearcher searcher;
                     searcher = new ManagementObjectSearcher(Scope, query);
 
-                    EnumerationOptions options = new EnumerationOptions();
-                    options.ReturnImmediately = true;
-
                     ManagementObjectCollection col = searcher.Get();
 
                     foreach (ManagementObject m in searcher.Get())
@@ -111,24 +108,26 @@ namespace ORMi
                 ManagementObjectSearcher searcher;
                 searcher = new ManagementObjectSearcher(Scope, query);
 
-                EnumerationOptions options = new EnumerationOptions();
-                options.ReturnImmediately = true;
-
                 ManagementObjectCollection col = searcher.Get();
 
                 foreach (ManagementObject m in searcher.Get())
                 {
                     foreach (PropertyInfo p in obj.GetType().GetProperties())
                     {
-                        WMIProperty propAtt = p.GetCustomAttribute<WMIProperty>();
+                        WMIIgnore ignoreProp = p.GetCustomAttribute<WMIIgnore>();
 
-                        if (propAtt != null)
+                        if (ignoreProp == null)
                         {
-                            m[propAtt.Name] = p.GetValue(obj);
-                        }
-                        else
-                        {
-                            m[p.Name] = p.GetValue(obj);
+                            WMIProperty propAtt = p.GetCustomAttribute<WMIProperty>();
+
+                            if (propAtt != null)
+                            {
+                                m[propAtt.Name] = p.GetValue(obj);
+                            }
+                            else
+                            {
+                                m[p.Name] = p.GetValue(obj);
+                            }
                         }
                     }
 
@@ -160,9 +159,6 @@ namespace ORMi
                 ManagementObjectSearcher searcher;
                 searcher = new ManagementObjectSearcher(Scope, query);
 
-                EnumerationOptions options = new EnumerationOptions();
-                options.ReturnImmediately = true;
-
                 foreach (ManagementObject m in searcher.Get())
                 {
                     m.Delete();
@@ -187,9 +183,6 @@ namespace ORMi
                 ManagementObjectSearcher searcher;
                 searcher = new ManagementObjectSearcher(Scope, query);
 
-                EnumerationOptions options = new EnumerationOptions();
-                options.ReturnImmediately = true;
-
                 foreach (ManagementObject m in searcher.Get())
                 {
                     m.Delete();
@@ -210,18 +203,16 @@ namespace ORMi
         {
             List<dynamic> res = new List<dynamic>();
 
-            ManagementObjectSearcher searcher;
-            searcher = new ManagementObjectSearcher(Scope, query);
-
-            EnumerationOptions options = new EnumerationOptions();
-            options.ReturnImmediately = true;
-
-            ManagementObjectCollection wmiRes = searcher.Get();
-
-            foreach (ManagementObject mo in wmiRes)
+            using (ManagementObjectSearcher searcher = new ManagementObjectSearcher(Scope, query))
             {
-                dynamic a = TypeHelper.LoadDynamicObject(mo);
-                res.Add(a);
+                using (ManagementObjectCollection wmiRes = searcher.Get())
+                {
+                    foreach (ManagementObject mo in wmiRes)
+                    {
+                        dynamic a = TypeHelper.LoadDynamicObject(mo);
+                        res.Add(a);
+                    }
+                }
             }
 
             return res;
@@ -238,20 +229,18 @@ namespace ORMi
 
             string nombre = TypeHelper.GetClassName(typeof(T));
 
-            string query = String.Format("SELECT * FROM {0}", nombre);
+            string query = String.Format("SELECT {0} FROM {1}", TypeHelper.GetPropertiesToSearch(typeof(T)), nombre);
 
-            ManagementObjectSearcher searcher;
-            searcher = new ManagementObjectSearcher(Scope, query);
-
-            EnumerationOptions options = new EnumerationOptions();
-            options.ReturnImmediately = true;
-
-            ManagementObjectCollection wmiRes = searcher.Get();
-
-            foreach (ManagementObject mo in wmiRes)
+            using (ManagementObjectSearcher searcher = new ManagementObjectSearcher(Scope, query))
             {
-                var a = (T)TypeHelper.LoadObject(mo, typeof(T));
-                res.Add(a);
+                using (ManagementObjectCollection wmiRes = searcher.Get())
+                {
+                    foreach (ManagementObject mo in wmiRes)
+                    {
+                        var a = (T)TypeHelper.LoadObject(mo, typeof(T));
+                        res.Add(a);
+                    }
+                }
             }
 
             return res;
@@ -277,18 +266,16 @@ namespace ORMi
         {
             List<T> res = new List<T>();
 
-            ManagementObjectSearcher searcher;
-            searcher = new ManagementObjectSearcher(Scope, query);
-
-            EnumerationOptions options = new EnumerationOptions();
-            options.ReturnImmediately = true;
-
-            ManagementObjectCollection wmiRes = searcher.Get();
-
-            foreach (ManagementObject mo in wmiRes)
+            using (ManagementObjectSearcher searcher = new ManagementObjectSearcher(Scope, query))
             {
-                var a = (T)TypeHelper.LoadObject(mo, typeof(T));
-                res.Add(a);
+                using (ManagementObjectCollection wmiRes = searcher.Get())
+                {
+                    foreach (ManagementObject mo in wmiRes)
+                    {
+                        var a = (T)TypeHelper.LoadObject(mo, typeof(T));
+                        res.Add(a);
+                    }
+                }
             }
 
             return res;
@@ -315,18 +302,16 @@ namespace ORMi
         {
             dynamic res = null;
 
-            ManagementObjectSearcher searcher;
-            searcher = new ManagementObjectSearcher(Scope, query);
-
-            EnumerationOptions options = new EnumerationOptions();
-            options.ReturnImmediately = true;
-
-            ManagementObjectCollection wmiRes = searcher.Get();
-
-            foreach (ManagementObject mo in wmiRes)
+            using (ManagementObjectSearcher searcher = new ManagementObjectSearcher(Scope, query))
             {
-                res = (T)TypeHelper.LoadObject(mo, typeof(T));
-                break;
+                using (ManagementObjectCollection wmiRes = searcher.Get())
+                {
+                    foreach (ManagementObject mo in wmiRes)
+                    {
+                        res = (T)TypeHelper.LoadObject(mo, typeof(T));
+                        break;
+                    }
+                }
             }
 
             return res;

@@ -17,22 +17,27 @@ namespace ORMi.Helpers
 
             foreach (PropertyInfo p in o.GetType().GetProperties())
             {
-                WMIProperty propAtt = p.GetCustomAttribute<WMIProperty>();
+                WMIIgnore ignoreProperty = p.GetCustomAttribute<WMIIgnore>();
 
-                string propertyName = String.Empty;
-
-                if (propAtt != null)
+                if (ignoreProperty == null)
                 {
-                    propertyName = propAtt.Name;
-                }
-                else
-                {
-                    propertyName = p.Name;
-                }
+                    WMIProperty propAtt = p.GetCustomAttribute<WMIProperty>();
 
-                var a = mo.Properties[propertyName].Value;
+                    string propertyName = String.Empty;
 
-                p.SetValue(o, Convert.ChangeType(a, p.PropertyType), null);
+                    if (propAtt != null)
+                    {
+                        propertyName = propAtt.Name;
+                    }
+                    else
+                    {
+                        propertyName = p.Name;
+                    }
+
+                    var a = mo.Properties[propertyName].Value;
+
+                    p.SetValue(o, Convert.ChangeType(a, p.PropertyType), null);
+                }
             }
 
             return o;
@@ -112,28 +117,33 @@ namespace ORMi.Helpers
 
             foreach (PropertyInfo propertyInfo in obj.GetType().GetProperties())
             {
-                WMIProperty propAtt = propertyInfo.GetCustomAttribute<WMIProperty>();
+                WMIIgnore ignoreProp = propertyInfo.GetCustomAttribute<WMIIgnore>();
 
-                if (propAtt == null)
+                if (ignoreProp == null)
                 {
-                    if (propertyInfo.GetValue(obj).GetType() == typeof(DateTime))
+                    WMIProperty propAtt = propertyInfo.GetCustomAttribute<WMIProperty>();
+
+                    if (propAtt == null)
                     {
-                        genericInstance[propertyInfo.Name.ToUpper()] = ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(propertyInfo.GetValue(obj)));
+                        if (propertyInfo.GetValue(obj).GetType() == typeof(DateTime))
+                        {
+                            genericInstance[propertyInfo.Name.ToUpper()] = ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(propertyInfo.GetValue(obj)));
+                        }
+                        else
+                        {
+                            genericInstance[propertyInfo.Name.ToUpper()] = propertyInfo.GetValue(obj);
+                        }
                     }
                     else
                     {
-                        genericInstance[propertyInfo.Name.ToUpper()] = propertyInfo.GetValue(obj);
-                    }
-                }
-                else
-                {
-                    if (propertyInfo.GetValue(obj).GetType() == typeof(DateTime))
-                    {
-                        genericInstance[propAtt.Name.ToUpper()] = ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(propertyInfo.GetValue(obj)));
-                    }
-                    else
-                    {
-                        genericInstance[propAtt.Name.ToUpper()] = propertyInfo.GetValue(obj);
+                        if (propertyInfo.GetValue(obj).GetType() == typeof(DateTime))
+                        {
+                            genericInstance[propAtt.Name.ToUpper()] = ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(propertyInfo.GetValue(obj)));
+                        }
+                        else
+                        {
+                            genericInstance[propAtt.Name.ToUpper()] = propertyInfo.GetValue(obj);
+                        }
                     }
                 }
             }
@@ -165,6 +175,32 @@ namespace ORMi.Helpers
             }
 
             return res;
+        }
+
+        public static string GetPropertiesToSearch(Type type)
+        {
+            List<String> res = new List<string>();
+
+            foreach (PropertyInfo propertyInfo in type.GetProperties())
+            {
+                WMIIgnore ignoreProp = propertyInfo.GetCustomAttribute<WMIIgnore>();
+
+                if (ignoreProp == null)
+                {
+                    WMIProperty propAtt = propertyInfo.GetCustomAttribute<WMIProperty>();
+
+                    if (propAtt == null)
+                    {
+                        res.Add(propertyInfo.Name.ToUpper());
+                    }
+                    else
+                    {
+                        res.Add(propAtt.Name.ToUpper());
+                    }
+                }
+            }
+
+            return String.Join(",", res);
         }
     }
 

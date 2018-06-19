@@ -9,6 +9,9 @@ namespace ORMi.Sample.Models
     [WMIClass("Win32_Processor")]
     public class Processor
     {
+        [WMIIgnore]
+        public string NonRequiredProp { get; set; }
+
         public string Name { get; set; }
 
         [WMIProperty("NumberOfCores")]
