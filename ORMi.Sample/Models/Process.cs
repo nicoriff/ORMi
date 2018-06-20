@@ -6,10 +6,15 @@ using System.Threading.Tasks;
 
 namespace ORMi.Sample.Models
 {
-    [WMIClass("Win32_ProcessStartTrace")]
+    [WMIClass("Win32_Process")]
     public class Process
     {
-        public string ProcessName { get; set; }
+        public string Name { get; set; }
         public int ProcessID { get; set; }
+
+        public void GetOwner()
+        {
+            WMIMethod.ExecuteMethod(this);
+        }
     }
 }

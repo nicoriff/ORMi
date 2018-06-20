@@ -116,6 +116,30 @@ namespace ORMi.Helpers
             return null;
         }
 
+        public static string GetNamespace(object o)
+        {
+            var dnAttribute = o.GetType().GetCustomAttributes(
+                           typeof(WMIClass), true
+                       ).FirstOrDefault() as WMIClass;
+            if (dnAttribute != null)
+            {
+                return dnAttribute.Namespace;
+            }
+            return null;
+        }
+
+        public static string GetNamespace(Type t)
+        {
+            var dnAttribute = t.GetCustomAttributes(
+                           typeof(WMIClass), true
+                       ).FirstOrDefault() as WMIClass;
+            if (dnAttribute != null)
+            {
+                return dnAttribute.Namespace;
+            }
+            return null;
+        }
+
         public static ManagementObject GetManagementObject(ManagementClass sourceClass, object obj)
         {
             ManagementObject genericInstance = sourceClass.CreateInstance();

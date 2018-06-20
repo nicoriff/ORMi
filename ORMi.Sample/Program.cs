@@ -13,20 +13,29 @@ namespace ORMi.Sample
         {
             WMIHelper helper = new WMIHelper("root\\CimV2");
 
-            var dynDevices = helper.Query("SELECT * FROM Win32_PnPEntity");
+            List<Process> processes = helper.Query<Process>().ToList();
 
-            var processors = helper.Query<Processor>();
-
-            List<Processor> procesors = helper.Query<Processor>().ToList();
-
-            List<Device> devices = helper.Query<Device>().ToList()
-                .Where(p => (p.Name ?? "")
-                .Contains("Intel")).ToList();
-
-            foreach (Device d in devices)
+            foreach (Process p in processes)
             {
-                Console.WriteLine(d.Name);
+                p.GetOwner();
             }
+
+            //new TestClass().DoSomething();
+
+            //var dynDevices = helper.Query("SELECT * FROM Win32_PnPEntity");
+
+            //var processors = helper.Query<Processor>();
+
+            //List<Processor> procesors = helper.Query<Processor>().ToList();
+
+            //List<Device> devices = helper.Query<Device>().ToList()
+            //    .Where(p => (p.Name ?? "")
+            //    .Contains("Intel")).ToList();
+
+            //foreach (Device d in devices)
+            //{
+            //    Console.WriteLine(d.Name);
+            //}
 
             //Person person = new Person
             //{

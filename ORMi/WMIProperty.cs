@@ -31,7 +31,14 @@ namespace ORMi
         {
             Name = name;
         }
+        public WMIClass(string name, string wmiNamespace)
+        {
+            Name = name;
+            Namespace = wmiNamespace;
+        }
+
         public string Name { get; set; }
+        public string Namespace { get; set; }
     }
 
     public class WMIIgnore : Attribute
