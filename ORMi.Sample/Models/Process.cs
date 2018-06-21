@@ -6,15 +6,16 @@ using System.Threading.Tasks;
 
 namespace ORMi.Sample.Models
 {
-    [WMIClass("Win32_Process")]
+    [WMIClass(Name = "Win32_Process", Namespace = "root\\CimV2")]
     public class Process
     {
+        public int Handle { get; set; }
         public string Name { get; set; }
         public int ProcessID { get; set; }
 
-        public void GetOwner()
+        public dynamic GetOwner()
         {
-            WMIMethod.ExecuteMethod(this);
+            return WMIMethod.ExecuteMethod(this);
         }
     }
 }
