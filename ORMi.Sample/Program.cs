@@ -27,7 +27,7 @@ namespace ORMi.Sample
 
             foreach (Process p in processes)
             {
-                dynamic d = p.GetOwner();
+                dynamic d = p.GetOwner(new { nombre = "Nico", apellido = "luque" });
             }
 
             //var dynDevices = helper.Query("SELECT * FROM Win32_PnPEntity");
