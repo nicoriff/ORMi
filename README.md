@@ -44,7 +44,16 @@ Then if we want to get the machine processors you just do:
     List<Processor> processors = helper.Query<Processor>().ToList();
 ```
 
-For adding, updating and deleting instances we are going to use a custom namespace and classes. In this example the namespace is 'root\EmployeesSystem'. And we have the following class defined:
+If you don´t want to define your model classes the you can also get the result in a `List<dynamic>`
+
+```C#
+var devices = helper.Query("SELECT * FROM Win32_PnPEntity");
+```
+ORMi also support async operations.
+
+## Create, Update and Delete:
+
+For adding, updating and deleting instances we are going to use a custom namespace and classes. In this example the namespace is `root\EmployeesSystem`. And we have the following class defined:
 
 ```C#
     [WMIClass("Lnl_Person")]
@@ -137,3 +146,96 @@ And then, just handle the events...
         Console.WriteLine("New Process: {0} (Pid: {1})", process.ProcessName, process.ProcessID.ToString());
     }
 ```
+Or you can just not define any Type to return and ORMi will return a dynamic object containing all the WMI properties for the WMI instance:
+
+```C#
+WMIWatcher watcher = new WMIWatcher("root\\CimV2", "SELECT * FROM Win32_ProcessStartTrace");
+watcher.WMIEventArrived += Watcher_WMIEventArrived;
+```
+
+## Methods
+
+Since version 1.3.0 ORMi supports method working in a quite simple way. WMI defines two types of methods: Instance methods and Static methods.
+
+Static methods are the ones in which you don´t need any instance of a class to run the method. You just call the method and that´s about it. What you will have to do on with ORMi to call the methods you want, is to define them on your model class. This will make a more readable and understandable code, and you will not have to mess with the complexity of having to do all the method calling coding by yourself.
+
+**Static Methods:**
+
+Let´s suppose we have a model class that represents an output on a smart card reader. The class will look like this:
+```C#
+    [WMIClass("Lnl_ReaderOutput1")]
+    public class Output
+    {
+        public int PanelID { get; set; }
+        public int ReaderID { get; set; }
+        public string Hostname { get; set; }
+        public string Name { get; set; }
+    }
+```
+
+We want to call a method that `Lnl_ReaderOutput1` has defined as `Activate` with no parameters in it. First, we are going to change a little bit the `WMIClass` attribute that the class has set. We are going to define the default namespace for the class:
+```C#
+[WMIClass(Name = "Lnl_ReaderOutput1", Namespace = "root\\OnGuard")]
+```
+Then, we have to add the method:
+```C#
+	public dynamic Activate()
+	{
+	    return WMIMethod.ExecuteMethod(this);
+	}
+```
+There is two things to note on the above code. The first one is that the method name **MUST** be the same than the method defined on the WMI class that we want to work with. The second one is that the method implementation will always be the same
+
+What `WMIMethod.ExecuteMethod(this)` does is to call the static `WMIMethod` class and pass the actual instance so the WMI methods can be called. If the method require parameters being sent, so we can pass them using a anonymous object:
+
+```C#
+	public dynamic Activate(int panelID, int readerID)
+	{
+	    return WMIMethod.ExecuteMethod(this, new { PanelID = panelID, ReaderID = readerID });
+	}
+```
+So, finally, on your code you will have a much more cleaner implementation of method working:
+
+```C#
+	List<Output> outputList = helper.Query<Output>().ToList();
+
+	foreach (Output o in outputList)
+	{
+	    dynamic d = o.Activate(1, 5);
+	}
+```
+
+**Instance Methods:**
+
+Instance methods are a little bit more complicated than static ones. Instance methods (as you imagine) requiere that you call the method on an actual instance of a class. So you will first have to retrieve the instance on where you want to run the method. In this example we are going to work with `Win32_Printer` class and we are going to rename one printer.
+
+Firstly, we are going to define our class:
+```C#
+	[WMIClass(Name = "Win32_Printer", Namespace = "root\\CimV2")]
+	public class Printer
+	{
+	    public string DeviceID { get; set; }
+	    public string Name { get; set; }
+	    public string Caption { get; set; }
+
+	    public void RenamePrinter(string newName)
+	    {
+	        WMIMethod.ExecuteMethod(this, new { NewPrinterName = newName });
+	    }
+	}
+   ```
+
+Note that we have a `DeviceID` property. This property must always be set on this case because in this case, `DeviceID` is a `CIM_Key` and `Unique` and it is the only unique identifier between instances. If you do not set this property then you will get an exception.
+Also you can note that the parameters are sent using an anonymous object with properties that match the instance method ones. If this properties cannot be mapped the you´ll have an exception.
+
+Then finally we´ll use it this way:
+
+```C#
+	List<Printer> printers = helper.Query<Printer>().ToList();
+
+	foreach (Printer p in printers)
+	{
+	    p.RenamePrinter(new { NewPrinterName = "Newly renamed printer" });
+	}
+```
+The above code will rename all printers to "Newly renamed printer" (be careful! :D)

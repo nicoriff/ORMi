@@ -13,12 +13,19 @@ namespace ORMi.Sample
         {
             WMIHelper helper = new WMIHelper("root\\CimV2");
 
+            List<Printer> printers = helper.Query<Printer>().ToList();
+
+            foreach (Printer p in printers)
+            {
+                p.RenamePrinter("Newly renamed printer");
+            }
+
             //Output outp = new Output
             //{
             //    PanelID = 10,
             //    ReaderID = 1,
-            //    Hostname = "VLABA-ONGUARD01",
-            //    Name = "VLABA-ONGUARD01"
+            //    Hostname = "ONGUARD01",
+            //    Name = "ONGUARD01"
             //};
 
             //outp.Activate();
@@ -27,7 +34,7 @@ namespace ORMi.Sample
 
             foreach (Process p in processes)
             {
-                dynamic d = p.GetOwner(new { nombre = "Nico", apellido = "luque" });
+                dynamic d = p.GetOwner();
             }
 
             //var dynDevices = helper.Query("SELECT * FROM Win32_PnPEntity");

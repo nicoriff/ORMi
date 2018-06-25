@@ -14,9 +14,9 @@ namespace ORMi.Sample.Models
         public string Hostname { get; set; }
         public string Name { get; set; }
 
-        public void Activate()
+        public dynamic Activate()
         {
-            WMIMethod.ExecuteMethod(this);
+            return WMIMethod.ExecuteMethod(this);
         }
     }
 }

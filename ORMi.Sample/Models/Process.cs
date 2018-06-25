@@ -13,9 +13,9 @@ namespace ORMi.Sample.Models
         public string Name { get; set; }
         public int ProcessID { get; set; }
 
-        public dynamic GetOwner(dynamic parameters)
+        public dynamic GetOwner()
         {
-            return WMIMethod.ExecuteMethod(this, parameters);
+            return WMIMethod.ExecuteMethod(this);
         }
     }
 }
