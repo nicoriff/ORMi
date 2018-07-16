@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Models\Device.cs" />
+    <Compile Include="Models\NetworkAdapterConfiguration.cs" />
     <Compile Include="Models\Output.cs" />
     <Compile Include="Models\Person.cs" />
     <Compile Include="Models\Printer.cs" />

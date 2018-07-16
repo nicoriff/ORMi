@@ -13,69 +13,76 @@ namespace ORMi.Sample
         {
             WMIHelper helper = new WMIHelper("root\\CimV2");
 
-            List<Printer> printers = helper.Query<Printer>().ToList();
+            var interfaces = helper.Query<NetworkAdapterConfiguration>();
 
-            foreach (Printer p in printers)
+            foreach (var i in interfaces)
             {
-                p.RenamePrinter("Newly renamed printer");
+                i.SetStatic("123.123.123.123","255.255.255.0");
             }
 
-            //Output outp = new Output
-            //{
-            //    PanelID = 10,
-            //    ReaderID = 1,
-            //    Hostname = "ONGUARD01",
-            //    Name = "ONGUARD01"
-            //};
+    //List<Printer> printers = helper.Query<Printer>().ToList();
 
-            //outp.Activate();
+    //foreach (Printer p in printers)
+    //{
+    //    p.RenamePrinter("Newly renamed printer");
+    //}
 
-            List<Process> processes = helper.Query<Process>().ToList();
+    //Output outp = new Output
+    //{
+    //    PanelID = 10,
+    //    ReaderID = 1,
+    //    Hostname = "ONGUARD01",
+    //    Name = "ONGUARD01"
+    //};
 
-            foreach (Process p in processes)
-            {
-                dynamic d = p.GetOwner();
-            }
+    //outp.Activate();
 
-            //var dynDevices = helper.Query("SELECT * FROM Win32_PnPEntity");
+    //List<Process> processes = helper.Query<Process>().ToList();
 
-            //var processors = helper.Query<Processor>();
+    //foreach (Process p in processes)
+    //{
+    //    dynamic d = p.GetOwner();
+    //}
 
-            //List<Processor> procesors = helper.Query<Processor>().ToList();
+    //var dynDevices = helper.Query("SELECT * FROM Win32_PnPEntity");
 
-            //List<Device> devices = helper.Query<Device>().ToList()
-            //    .Where(p => (p.Name ?? "")
-            //    .Contains("Intel")).ToList();
+    //var processors = helper.Query<Processor>();
 
-            //foreach (Device d in devices)
-            //{
-            //    Console.WriteLine(d.Name);
-            //}
+    //List<Processor> procesors = helper.Query<Processor>().ToList();
 
-            //Person person = new Person
-            //{
-            //    FirstName = "John",
-            //    Lastname = "Doe",
-            //    DocumentNumber = "9995",
-            //    Segment = -1,
-            //    Age = 43
-            //};
+    //List<Device> devices = helper.Query<Device>().ToList()
+    //    .Where(p => (p.Name ?? "")
+    //    .Contains("Intel")).ToList();
 
-            //helper.AddInstance(person);
+    //foreach (Device d in devices)
+    //{
+    //    Console.WriteLine(d.Name);
+    //}
 
-            //Person queryPersonSingle = helper.Query<Person>("SELECT * FROM Lnl_Cardholder WHERE LASTNAME = 'Doe Modified'").SingleOrDefault();
+    //Person person = new Person
+    //{
+    //    FirstName = "John",
+    //    Lastname = "Doe",
+    //    DocumentNumber = "9995",
+    //    Segment = -1,
+    //    Age = 43
+    //};
 
-            //queryPersonSingle.Lastname = "Doe Modified";
+    //helper.AddInstance(person);
 
-            //helper.UpdateInstance(queryPersonSingle);
+    //Person queryPersonSingle = helper.Query<Person>("SELECT * FROM Lnl_Cardholder WHERE LASTNAME = 'Doe Modified'").SingleOrDefault();
 
-            //List<Person> queryPerson = helper.Query<Person>("SELECT * FROM Lnl_Cardholder WHERE LASTNAME = 'Lopez'").ToList();
+    //queryPersonSingle.Lastname = "Doe Modified";
 
-            //WMIWatcher watcher = new WMIWatcher("root\\CimV2", "SELECT * FROM Win32_ProcessStartTrace", typeof(Process));
-            //WMIWatcher watcher = new WMIWatcher("root\\CimV2", "SELECT * FROM Win32_ProcessStartTrace");
-            //watcher.WMIEventArrived += Watcher_WMIEventArrived;
+    //helper.UpdateInstance(queryPersonSingle);
 
-            Console.ReadLine();
+    //List<Person> queryPerson = helper.Query<Person>("SELECT * FROM Lnl_Cardholder WHERE LASTNAME = 'Lopez'").ToList();
+
+    //WMIWatcher watcher = new WMIWatcher("root\\CimV2", "SELECT * FROM Win32_ProcessStartTrace", typeof(Process));
+    //WMIWatcher watcher = new WMIWatcher("root\\CimV2", "SELECT * FROM Win32_ProcessStartTrace");
+    //watcher.WMIEventArrived += Watcher_WMIEventArrived;
+
+    Console.ReadLine();
         }
 
         private static void Watcher_WMIEventArrived(object sender, WMIEventArgs e)

@@ -44,7 +44,7 @@ namespace ORMi
         {
             WindowsImpersonationContext impersonatedUser = WindowsIdentity.GetCurrent().Impersonate();
 
-            var frame = new StackTrace().GetFrames().Skip(2).First(x => x.GetMethod().DeclaringType.Namespace != "System.Dynamic");
+            var frame = new StackTrace().GetFrames().Skip(1).First(x => x.GetMethod().DeclaringType.Namespace != "System.Dynamic");
 
             string methodName = frame.GetMethod().Name;
 
