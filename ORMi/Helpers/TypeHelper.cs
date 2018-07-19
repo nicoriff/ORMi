@@ -91,9 +91,8 @@ namespace ORMi.Helpers
 
         public static string GetClassName(object p)
         {
-            var dnAttribute = p.GetType().GetCustomAttributes(
-                typeof(WMIClass), true
-            ).FirstOrDefault() as WMIClass;
+            var dnAttribute = p.GetType().GetCustomAttribute<WMIClass>(true);
+
             if (dnAttribute != null)
             {
                 return dnAttribute.Name;
@@ -106,37 +105,37 @@ namespace ORMi.Helpers
 
         public static string GetClassName(Type t)
         {
-            var dnAttribute = t.GetCustomAttributes(
-                           typeof(WMIClass), true
-                       ).FirstOrDefault() as WMIClass;
+            var dnAttribute = t.GetCustomAttribute<WMIClass>(true);
+
             if (dnAttribute != null)
             {
                 return dnAttribute.Name;
             }
+
             return null;
         }
 
         public static string GetNamespace(object o)
         {
-            var dnAttribute = o.GetType().GetCustomAttributes(
-                           typeof(WMIClass), true
-                       ).FirstOrDefault() as WMIClass;
+            var dnAttribute = o.GetType().GetCustomAttribute<WMIClass>(true);
+
             if (dnAttribute != null)
             {
                 return dnAttribute.Namespace;
             }
+
             return null;
         }
 
         public static string GetNamespace(Type t)
         {
-            var dnAttribute = t.GetCustomAttributes(
-                           typeof(WMIClass), true
-                       ).FirstOrDefault() as WMIClass;
+            var dnAttribute = t.GetCustomAttribute<WMIClass>(true);
+
             if (dnAttribute != null)
             {
                 return dnAttribute.Namespace;
             }
+
             return null;
         }
 
