@@ -17,27 +17,7 @@ namespace ORMi.Helpers
 
             foreach (PropertyInfo p in o.GetType().GetProperties())
             {
-                WMIIgnore ignoreProperty = p.GetCustomAttribute<WMIIgnore>();
-
-                if (ignoreProperty == null)
-                {
-                    WMIProperty propAtt = p.GetCustomAttribute<WMIProperty>();
-
-                    string propertyName = String.Empty;
-
-                    if (propAtt != null)
-                    {
-                        propertyName = propAtt.Name;
-                    }
-                    else
-                    {
-                        propertyName = p.Name;
-                    }
-
-                    var a = mo.Properties[propertyName].Value;
-
-                    p.SetValue(o, Convert.ChangeType(a, p.PropertyType), null);
-                }
+                _SetPropertyValue(mo, p, o);
             }
 
             return o;
@@ -63,37 +43,44 @@ namespace ORMi.Helpers
 
             foreach (PropertyInfo p in o.GetType().GetProperties())
             {
-                WMIIgnore ignoreProp = p.GetCustomAttribute<WMIIgnore>();
-
-                if (ignoreProp == null)
-                {
-                    WMIProperty propAtt = p.GetCustomAttribute<WMIProperty>();
-
-                    string propertyName = String.Empty;
-
-                    if (propAtt != null)
-                    {
-                        propertyName = propAtt.Name;
-                    }
-                    else
-                    {
-                        propertyName = p.Name;
-                    }
-
-                    var a = mo.Properties[propertyName].Value;
-
-                    p.SetValue(o, Convert.ChangeType(a, p.PropertyType), null);
-                }
+                _SetPropertyValue(mo, p, o);
             }
 
             return o;
         }
 
+        private static void _SetPropertyValue(ManagementBaseObject mo, PropertyInfo p, object o)
+        {
+            WMIIgnore ignoreProp = p.GetCustomAttribute<WMIIgnore>();
+
+            if (ignoreProp == null)
+            {
+                WMIProperty propAtt = p.GetCustomAttribute<WMIProperty>();
+
+                string propertyName = String.Empty;
+
+                if (propAtt != null)
+                {
+                    propertyName = propAtt.Name;
+                }
+                else
+                {
+                    propertyName = p.Name;
+                }
+
+                var a = mo.Properties[propertyName].Value;
+
+                if (p.PropertyType == typeof(DateTime) && a is string s)
+                    p.SetValue(o, ManagementDateTimeConverter.ToDateTime((string)a), null);
+                else
+                    p.SetValue(o, Convert.ChangeType(a, p.PropertyType), null);
+            }
+        }
+
         public static string GetClassName(object p)
         {
-            var dnAttribute = p.GetType().GetCustomAttributes(
-                typeof(WMIClass), true
-            ).FirstOrDefault() as WMIClass;
+            var dnAttribute = p.GetType().GetCustomAttribute<WMIClass>(true);
+
             if (dnAttribute != null)
             {
                 return dnAttribute.Name;
@@ -106,43 +93,52 @@ namespace ORMi.Helpers
 
         public static string GetClassName(Type t)
         {
-            var dnAttribute = t.GetCustomAttributes(
-                           typeof(WMIClass), true
-                       ).FirstOrDefault() as WMIClass;
+            var dnAttribute = t.GetCustomAttribute<WMIClass>(true);
+
             if (dnAttribute != null)
             {
                 return dnAttribute.Name;
             }
+
             return null;
         }
 
         public static string GetNamespace(object o)
         {
-            var dnAttribute = o.GetType().GetCustomAttributes(
-                           typeof(WMIClass), true
-                       ).FirstOrDefault() as WMIClass;
+            var dnAttribute = o.GetType().GetCustomAttribute<WMIClass>(true);
+
             if (dnAttribute != null)
             {
                 return dnAttribute.Namespace;
             }
+
             return null;
         }
 
         public static string GetNamespace(Type t)
         {
-            var dnAttribute = t.GetCustomAttributes(
-                           typeof(WMIClass), true
-                       ).FirstOrDefault() as WMIClass;
+            var dnAttribute = t.GetCustomAttribute<WMIClass>(true);
+
             if (dnAttribute != null)
             {
                 return dnAttribute.Namespace;
             }
+
             return null;
         }
 
         public static ManagementObject GetManagementObject(ManagementClass sourceClass, object obj)
         {
-            ManagementObject genericInstance = sourceClass.CreateInstance();
+            ManagementObject genericInstance;
+            try
+            {
+                genericInstance = sourceClass.CreateInstance();
+            }
+            catch (ManagementException ex) when (ex.ErrorCode == ManagementStatus.NotFound)
+            {
+                // rethrow with actual class name we tried
+                throw new Exception($"Couldn't find management class {sourceClass}", ex);
+            }
 
             foreach (PropertyInfo propertyInfo in obj.GetType().GetProperties())
             {
