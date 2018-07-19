@@ -141,7 +141,16 @@ namespace ORMi.Helpers
 
         public static ManagementObject GetManagementObject(ManagementClass sourceClass, object obj)
         {
-            ManagementObject genericInstance = sourceClass.CreateInstance();
+            ManagementObject genericInstance;
+            try
+            {
+                genericInstance = sourceClass.CreateInstance();
+            }
+            catch (ManagementException ex) when (ex.ErrorCode == ManagementStatus.NotFound)
+            {
+                // rethrow with actual class name we tried
+                throw new Exception($"Couldn't find management class {sourceClass}", ex);
+            }
 
             foreach (PropertyInfo propertyInfo in obj.GetType().GetProperties())
             {
