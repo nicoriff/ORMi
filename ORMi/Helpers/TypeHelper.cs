@@ -17,27 +17,7 @@ namespace ORMi.Helpers
 
             foreach (PropertyInfo p in o.GetType().GetProperties())
             {
-                WMIIgnore ignoreProperty = p.GetCustomAttribute<WMIIgnore>();
-
-                if (ignoreProperty == null)
-                {
-                    WMIProperty propAtt = p.GetCustomAttribute<WMIProperty>();
-
-                    string propertyName = String.Empty;
-
-                    if (propAtt != null)
-                    {
-                        propertyName = propAtt.Name;
-                    }
-                    else
-                    {
-                        propertyName = p.Name;
-                    }
-
-                    var a = mo.Properties[propertyName].Value;
-
-                    p.SetValue(o, Convert.ChangeType(a, p.PropertyType), null);
-                }
+                _SetPropertyValue(mo, p, o);
             }
 
             return o;
@@ -63,30 +43,38 @@ namespace ORMi.Helpers
 
             foreach (PropertyInfo p in o.GetType().GetProperties())
             {
-                WMIIgnore ignoreProp = p.GetCustomAttribute<WMIIgnore>();
-
-                if (ignoreProp == null)
-                {
-                    WMIProperty propAtt = p.GetCustomAttribute<WMIProperty>();
-
-                    string propertyName = String.Empty;
-
-                    if (propAtt != null)
-                    {
-                        propertyName = propAtt.Name;
-                    }
-                    else
-                    {
-                        propertyName = p.Name;
-                    }
-
-                    var a = mo.Properties[propertyName].Value;
-
-                    p.SetValue(o, Convert.ChangeType(a, p.PropertyType), null);
-                }
+                _SetPropertyValue(mo, p, o);
             }
 
             return o;
+        }
+
+        private static void _SetPropertyValue(ManagementBaseObject mo, PropertyInfo p, object o)
+        {
+            WMIIgnore ignoreProp = p.GetCustomAttribute<WMIIgnore>();
+
+            if (ignoreProp == null)
+            {
+                WMIProperty propAtt = p.GetCustomAttribute<WMIProperty>();
+
+                string propertyName = String.Empty;
+
+                if (propAtt != null)
+                {
+                    propertyName = propAtt.Name;
+                }
+                else
+                {
+                    propertyName = p.Name;
+                }
+
+                var a = mo.Properties[propertyName].Value;
+
+                if (p.PropertyType == typeof(DateTime) && a is string s)
+                    p.SetValue(o, ManagementDateTimeConverter.ToDateTime((string)a), null);
+                else
+                    p.SetValue(o, Convert.ChangeType(a, p.PropertyType), null);
+            }
         }
 
         public static string GetClassName(object p)

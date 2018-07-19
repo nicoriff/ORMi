@@ -13,6 +13,11 @@ namespace ORMi.Sample.Models
         public string Name { get; set; }
         public int ProcessID { get; set; }
 
+        /// <summary>
+        /// Date the process begins executing.
+        /// </summary>
+        public DateTime CreationDate { get; set; }
+
         public dynamic GetOwner()
         {
             return WMIMethod.ExecuteMethod(this);
