@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="Models\Device.cs" />
     <Compile Include="Models\NetworkAdapterConfiguration.cs" />
+    <Compile Include="Models\NetworkInterface.cs" />
     <Compile Include="Models\OperatingSystem.cs" />
     <Compile Include="Models\Output.cs" />
     <Compile Include="Models\Person.cs" />

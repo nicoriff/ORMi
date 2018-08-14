@@ -70,10 +70,18 @@ namespace ORMi.Helpers
 
                 var a = mo.Properties[propertyName].Value;
 
-                if (p.PropertyType == typeof(DateTime) && a is string s)
+                if (a == null)
+                {
+                    p.SetValue(o, null);
+                }
+                else if (p.PropertyType == typeof(DateTime) && a is string s)
+                {
                     p.SetValue(o, ManagementDateTimeConverter.ToDateTime((string)a), null);
+                }
                 else
+                {
                     p.SetValue(o, Convert.ChangeType(a, p.PropertyType), null);
+                }
             }
         }
 
