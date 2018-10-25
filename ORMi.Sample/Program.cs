@@ -13,7 +13,7 @@ namespace ORMi.Sample
         {
             WMIHelper helper = new WMIHelper("root\\CimV2");
 
-            List<NetworkAdapterConfiguration> interfaces = helper.Query<NetworkAdapterConfiguration>().ToList();
+            //List<NetworkAdapterConfiguration> interfaces = helper.Query<NetworkAdapterConfiguration>().ToList();
 
 
 
@@ -34,12 +34,14 @@ namespace ORMi.Sample
 
             //outp.Activate();
 
-            //List<Process> processes = helper.Query<Process>().ToList();
+            List<Process> processes = helper.Query<Process>().ToList();
 
-            //foreach (Process p in processes)
-            //{
-            //    dynamic d = p.GetOwner();
-            //}
+            foreach (Process p in processes)
+            {
+                dynamic d = p.GetOwnerSid();
+                ProcessOwner po = p.GetOwner();
+                //int res = p.AttachDebugger();
+            }
 
             //var dynDevices = helper.Query("SELECT * FROM Win32_PnPEntity");
 

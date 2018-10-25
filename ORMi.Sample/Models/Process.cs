@@ -18,9 +18,26 @@ namespace ORMi.Sample.Models
         /// </summary>
         public DateTime CreationDate { get; set; }
 
-        public dynamic GetOwner()
+        public dynamic GetOwnerSid()
         {
             return WMIMethod.ExecuteMethod(this);
         }
+
+        public ProcessOwner GetOwner()
+        {
+            return WMIMethod.ExecuteMethod<ProcessOwner>(this);
+        }
+
+        public int AttachDebugger()
+        {
+            return WMIMethod.ExecuteMethod<int>(this);
+        }
+    }
+
+    public class ProcessOwner
+    {
+        public string Domain { get; set; }
+        public int ReturnValue { get; set; }
+        public string User { get; set; }
     }
 }
