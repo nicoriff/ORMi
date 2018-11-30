@@ -78,11 +78,11 @@ namespace ORMi
 
                                 if (propAtt != null)
                                 {
-                                    m[propAtt.Name] = p.GetValue(obj);
+                                    m[propAtt.Name] = p.GetValue(obj).GetType() == typeof(DateTime) ? ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(p.GetValue(obj))) : p.GetValue(obj);
                                 }
                                 else
                                 {
-                                    m[p.Name] = p.GetValue(obj);
+                                    m[p.Name] = p.GetValue(obj).GetType() == typeof(DateTime) ? ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(p.GetValue(obj))) : p.GetValue(obj);
                                 }
                             }
                         }
@@ -127,11 +127,11 @@ namespace ORMi
 
                             if (propAtt != null)
                             {
-                                m[propAtt.Name] = p.GetValue(obj);
+                                m[propAtt.Name] = p.GetValue(obj).GetType() == typeof(DateTime) ? ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(p.GetValue(obj))) : p.GetValue(obj);
                             }
                             else
                             {
-                                m[p.Name] = p.GetValue(obj);
+                                m[p.Name] = p.GetValue(obj).GetType() == typeof(DateTime) ? ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(p.GetValue(obj))) : p.GetValue(obj);
                             }
                         }
                     }
