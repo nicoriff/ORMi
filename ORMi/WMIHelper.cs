@@ -44,9 +44,19 @@ namespace ORMi
         }
 
         /// <summary>
+        /// Adds a new WMI Instance asynchronously
+        /// </summary>
+        /// <param name="obj">Object to add. The classname and properties or corresponding attributes will be maped to the corresponding WMI structure</param>
+        /// <returns></returns>
+        public async Task AddInstanceAsync(object obj)
+        {
+            await Task.Run(() => AddInstance(obj));
+        }
+
+        /// <summary>
         /// Modifies an existing instance.
         /// </summary>
-        /// <param name="obj">Object to update. ORMi will search the property with the SearchKey attribute. That value is going to be used to make the update.</param>
+        /// <param name="obj">Object to be updated. ORMi will search the property with the SearchKey attribute. That value is going to be used to make the update.</param>
         public void UpdateInstance(object obj)
         {
             try
@@ -98,6 +108,16 @@ namespace ORMi
         }
 
         /// <summary>
+        /// Modifies an existing instance asynchonously.
+        /// </summary>
+        /// <param name="obj">Object to be updated. ORMi will search the property with the SearchKey attribute. That value is going to be used to make the update.</param>
+        /// <returns></returns>
+        public async Task UpdateInstanceAsync(object obj)
+        {
+            await Task.Run(() => UpdateInstance(obj));
+        }
+
+        /// <summary>
         /// Modifies an existing instance based on a custom query.
         /// </summary>
         /// <param name="obj">Object to be updated</param>
@@ -146,6 +166,17 @@ namespace ORMi
         }
 
         /// <summary>
+        /// Modifies an existing instance based on a custom query asynchonously.
+        /// </summary>
+        /// <param name="obj">Object to be updated</param>
+        /// <param name="query">Query to be run. The resulting instances will be updated</param>
+        /// <returns></returns>
+        public async Task UpdateInstanceAsync(object obj, string query)
+        {
+            await Task.Run(() => UpdateInstance(obj, query));
+        }
+
+        /// <summary>
         /// Remove a WMI instance.
         /// </summary>
         /// <param name="obj">Object to be removed.</param>
@@ -176,7 +207,17 @@ namespace ORMi
         }
 
         /// <summary>
-        /// Remove a WMI Instance based on a custom query.
+        /// Remove a WMI instance asynchronously.
+        /// </summary>
+        /// <param name="obj">Object to be removed.</param>
+        /// <returns></returns>
+        public async Task RemoveInstanceAsync(object obj)
+        {
+            await Task.Run(() => RemoveInstance(obj));
+        }
+
+        /// <summary>
+        /// Remove WMI instances based on a custom query.
         /// </summary>
         /// <param name="query">Query that returns the objects to be removed</param>
         public void RemoveInstance(string query)
@@ -197,6 +238,16 @@ namespace ORMi
             {
                 throw ex;
             }
+        }
+
+        /// <summary>
+        /// Remove WMI instances based on a custom query asynchronously.
+        /// </summary>
+        /// <param name="query">Query that returns the objects to be removed</param>
+        /// <returns></returns>
+        public async Task RemoveInstanceAsync(string query)
+        {
+            await Task.Run(() => RemoveInstance(query));
         }
 
         /// <summary>
