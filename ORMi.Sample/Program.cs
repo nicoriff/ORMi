@@ -15,7 +15,7 @@ namespace ORMi.Sample
 
             //List<NetworkAdapterConfiguration> interfaces = helper.Query<NetworkAdapterConfiguration>().ToList();
 
-
+            Printer printer = helper.QueryFirstOrDefault<Printer>();
 
             //List<Printer> printers = helper.Query<Printer>().ToList();
 
@@ -34,7 +34,7 @@ namespace ORMi.Sample
 
             //outp.Activate();
 
-            List<Process> processes = helper.Query<Process>().ToList();
+            List<Process> processes = helper.QueryAsync<Process>().Result.ToList();
 
             foreach (Process p in processes)
             {

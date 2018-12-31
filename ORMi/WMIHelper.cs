@@ -224,6 +224,16 @@ namespace ORMi
         }
 
         /// <summary>
+        /// Runs a async query against WMI. It will return a IEnumerable of dynamic type. No type mapping is done.
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<dynamic>> QueryAsync(string query)
+        {
+            return await Task.Run(() => Query(query));
+        }
+
+        /// <summary>
         /// Runs a query against WMI. It will return all instances of the class corresponding to the WMI class set on the Type on IEnumerable.
         /// </summary>
         /// <typeparam name="T">The Type of IEnumerable that will be returned</typeparam>
@@ -300,12 +310,49 @@ namespace ORMi
         /// <summary>
         /// Runs a custom query against WMI returning a single value.
         /// </summary>
-        /// <typeparam name="T">The Type of IEnumerable that will be returned</typeparam>
-        /// <param name="query">Query to be run against WMI</param>
+        /// <param name="query">Query to be run</param>
         /// <returns></returns>
-        public dynamic QuerySingle<T>(string query)
+        public dynamic QueryFirstOrDefault(string query)
         {
             dynamic res = null;
+
+            using (ManagementObjectSearcher searcher = new ManagementObjectSearcher(Scope, query))
+            {
+                using (ManagementObjectCollection wmiRes = searcher.Get())
+                {
+                    foreach (ManagementObject mo in wmiRes)
+                    {
+                        res = TypeHelper.LoadDynamicObject(mo);
+                        break;
+                    }
+                }
+            }
+
+            return res;
+        }
+
+        /// <summary>
+        /// Runs an async query against WMI returning a single value.
+        /// </summary>
+        /// <param name="query">Query to be run</param>
+        /// <returns></returns>
+        public async Task<dynamic> QueryFirstOrDefaultAsync(string query)
+        {
+            return await Task.Run(() => QueryFirstOrDefault(query));
+        }
+
+        /// <summary>
+        /// Runs a query against WMI. It will return the first instance of the specified Type.
+        /// </summary>
+        /// <typeparam name="T">The Type of object that will be returned</typeparam>
+        /// <returns></returns>
+        public T QueryFirstOrDefault<T>()
+        {
+            object res = null;
+
+            string nombre = TypeHelper.GetClassName(typeof(T));
+
+            string query = String.Format("SELECT {0} FROM {1}", TypeHelper.GetPropertiesToSearch(typeof(T)), nombre);
 
             using (ManagementObjectSearcher searcher = new ManagementObjectSearcher(Scope, query))
             {
@@ -319,8 +366,55 @@ namespace ORMi
                 }
             }
 
-            return res;
+            return (T)res;
         }
+
+        /// <summary>
+        /// Runs an async query against WMI. It will return the first instance of the specified Type.
+        /// </summary>
+        /// <typeparam name="T">The Type of object that will be returned</typeparam>
+        /// <returns></returns>
+        public async Task<T> QueryFirstOrDefaultAsync<T>()
+        {
+            return await Task.Run(() => QueryFirstOrDefault<T>());
+        }
+
+        /// <summary>
+        /// Runs an custom query against WMI returning a single value of specified Type.
+        /// </summary>
+        /// <typeparam name="T">The Type of object that will be returned</typeparam>
+        /// <param name="query">Query to be run</param>
+        /// <returns></returns>
+        public T QueryFirstOrDefault<T>(string query)
+        {
+            object res = null;
+
+            using (ManagementObjectSearcher searcher = new ManagementObjectSearcher(Scope, query))
+            {
+                using (ManagementObjectCollection wmiRes = searcher.Get())
+                {
+                    foreach (ManagementObject mo in wmiRes)
+                    {
+                        res = (T)TypeHelper.LoadObject(mo, typeof(T));
+                        break;
+                    }
+                }
+            }
+
+            return (T)res;
+        }
+
+        /// <summary>
+        /// Runs an custom async query against WMI returning a single value of specified Type.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<T> QueryFirstOrDefaultAsync<T>(string query)
+        {
+            return await Task.Run(() => QueryFirstOrDefault<T>(query));
+        }
+
 
         #endregion
 
