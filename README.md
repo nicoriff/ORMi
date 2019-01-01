@@ -38,10 +38,14 @@ ORMi has some custom attributes to map the model clases to WMI classes. WMI clas
 Then if we want to get the machine processors you just do:
 
 ```C#
-
     WMIHelper helper = new WMIHelper("root\\CimV2");
 
     List<Processor> processors = helper.Query<Processor>().ToList();
+```
+This can also be done in async fashion:
+
+```C#
+    List<Processor> processors = await helper.QueryAsync<Processor>().ToList();
 ```
 
 If you don´t want to define your model classes the you can also get the result in a `List<dynamic>`
@@ -49,7 +53,11 @@ If you don´t want to define your model classes the you can also get the result i
 ```C#
 var devices = helper.Query("SELECT * FROM Win32_PnPEntity");
 ```
-ORMi also support async operations.
+You can also search for single instances:
+
+```C#
+Printer printer = helper.QueryFirstOrDefault<Printer>();
+```
 
 ## Create, Update and Delete:
 
@@ -107,6 +115,22 @@ As in the update operation, the removal works with the ```SearchKey``` property 
 ```C#
 	Person p = helper.Query<Person>("SELECT * FROM Lnl_Cardholder WHERE LASTNAME = 'Doe'").SingleOrDefault();
 	helper.RemoveInstance(p);
+```
+
+All above operations can also be done asynchronously. For example:
+
+ **Add Instance asynchronously:**
+ 
+```C#
+	 Person person = new Person
+	 {
+	     FirstName = "John",
+	     Lastname = "Doe",
+	     DocumentNumber = "9995",
+	     Segment = -1
+	 };
+
+	 await helper.AddInstanceAsync(person);
 ```
 
 **Creating an WMI Event Watcher:**
