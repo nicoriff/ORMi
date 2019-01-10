@@ -11,14 +11,14 @@ Once downloaded, you need to add the reference to the library on your project.
 
 ## How to Use
 
-ORMi is just too easy to work with. Let´s for example suppose we want to access 'root\CIMV2' namespace to get the some information about our computer proccesors. 
+ORMi is just too easy to work with. LetÂ´s for example suppose we want to access 'root\CIMV2' namespace to get the some information about our computer proccesors. 
 First of all, we need to use the library:
 
 ```C# 
 using ORMi;
 ```
 
-Then, we´ll define the following class:
+Then, weÂ´ll define the following class:
 
 ```C#
     [WMIClass("Win32_Processor")]
@@ -33,7 +33,7 @@ Then, we´ll define the following class:
     }
 ```
 
-ORMi has some custom attributes to map the model clases to WMI classes. WMI classes usually have tricky or non conventional names that you will for sure not want to use on your class. For solvig that problem ORMi just maps the class property name to the WMI property name. If you do not want to use the WMI property name then you can just specify the ```WMIProperty``` attribute ant put the name of the WMI property. The same run for class names. In that case you can make use of ```WMIClass```.
+ORMi has some custom attributes to map the model clases to WMI classes. WMI classes usually have tricky or non conventional names that you will for sure not want to use on your class. For solving that problem ORMi just maps the class property name to the WMI property name. If you do not want to use the WMI property name then you can just specify the ```WMIProperty``` attribute ant put the name of the WMI property. The same run for class names. In that case you can make use of ```WMIClass```.
 
 Then if we want to get the machine processors you just do:
 
@@ -48,7 +48,7 @@ This can also be done in async fashion:
     List<Processor> processors = await helper.QueryAsync<Processor>().ToList();
 ```
 
-If you don´t want to define your model classes the you can also get the result in a `List<dynamic>`
+If you donÂ´t want to define your model classes the you can also get the result in a `List<dynamic>`
 
 ```C#
 var devices = helper.Query("SELECT * FROM Win32_PnPEntity");
@@ -135,7 +135,7 @@ All above operations can also be done asynchronously. For example:
 
 **Creating an WMI Event Watcher:**
 
-Creating a watcher is one of the simplest tasks in ORMi. Just declare the watcher specifying scope, query and the desired output type and that´s it!. Start receiving events!.
+Creating a watcher is one of the simplest tasks in ORMi. Just declare the watcher specifying scope, query and the desired output type and thatÂ´s it!. Start receiving events!.
 In this example we are going to watch for new processes created on the system:
 
 First, we define the class:
@@ -181,11 +181,11 @@ watcher.WMIEventArrived += Watcher_WMIEventArrived;
 
 Since version 1.3.0 ORMi supports method working in a quite simple way. WMI defines two types of methods: Instance methods and Static methods.
 
-Static methods are the ones in which you don´t need any instance of a class to run the method. You just call the method and that´s about it. What you will have to do on with ORMi to call the methods you want, is to define them on your model class. This will make a more readable and understandable code, and you will not have to mess with the complexity of having to do all the method calling coding by yourself.
+Static methods are the ones in which you donÂ´t need any instance of a class to run the method. You just call the method and thatÂ´s about it. What you will have to do on with ORMi to call the methods you want, is to define them on your model class. This will make a more readable and understandable code, and you will not have to mess with the complexity of having to do all the method calling coding by yourself.
 
 **Static Methods:**
 
-Let´s suppose we have a model class that represents an output on a smart card reader. The class will look like this:
+LetÂ´s suppose we have a model class that represents an output on a smart card reader. The class will look like this:
 ```C#
     [WMIClass("Lnl_ReaderOutput1")]
     public class Output
@@ -250,9 +250,9 @@ Firstly, we are going to define our class:
    ```
 
 Note that we have a `DeviceID` property. This property must always be set on this case because in this case, `DeviceID` is a `CIM_Key` and `Unique` and it is the only unique identifier between instances. If you do not set this property then you will get an exception.
-Also you can note that the parameters are sent using an anonymous object with properties that match the instance method ones. If this properties cannot be mapped the you´ll have an exception.
+Also you can note that the parameters are sent using an anonymous object with properties that match the instance method ones. If this properties cannot be mapped the youÂ´ll have an exception.
 
-Then finally we´ll use it this way:
+Then finally weÂ´ll use it this way:
 
 ```C#
 	List<Printer> printers = helper.Query<Printer>().ToList();
