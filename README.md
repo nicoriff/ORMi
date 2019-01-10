@@ -259,7 +259,7 @@ Then finally we´ll use it this way:
 
 	foreach (Printer p in printers)
 	{
-	    p.RenamePrinter(new { NewPrinterName = "Newly renamed printer" });
+	    p.RenamePrinter("Newly renamed printer");
 	}
 ```
 The above code will rename all printers to "Newly renamed printer" (be careful! :D)
