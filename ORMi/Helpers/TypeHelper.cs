@@ -107,8 +107,10 @@ namespace ORMi.Helpers
             {
                 return dnAttribute.Name;
             }
-
-            return null;
+            else
+            {
+                return t.Name;
+            }
         }
 
         public static string GetNamespace(object o)
