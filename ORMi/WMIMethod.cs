@@ -34,7 +34,7 @@ namespace ORMi
 
             ManagementBaseObject result = instance.InvokeMethod(methodName, null, null);
 
-            return TypeHelper.LoadDynamicObject(result);
+            return result == null ? null : TypeHelper.LoadDynamicObject(result);
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace ORMi
 
             ManagementBaseObject result = instance.InvokeMethod(methodName, inParams, null);
 
-            return TypeHelper.LoadDynamicObject(result);
+            return result == null ? null : TypeHelper.LoadDynamicObject(result);
         }
 
         /// <summary>
@@ -135,7 +135,7 @@ namespace ORMi
 
             ManagementBaseObject result = cls.InvokeMethod(methodName, null, null);
 
-            return TypeHelper.LoadDynamicObject(result);
+            return result == null ? null : TypeHelper.LoadDynamicObject(result);
         }
 
         /// <summary>
@@ -181,7 +181,7 @@ namespace ORMi
 
             ManagementBaseObject result = cls.InvokeMethod(methodName, inParams, null);
 
-            return TypeHelper.LoadDynamicObject(result);
+            return result == null ? null : TypeHelper.LoadDynamicObject(result);
         }
 
         /// <summary>
