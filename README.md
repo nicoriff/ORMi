@@ -117,6 +117,8 @@ As in the update operation, the removal works with the ```SearchKey``` property 
 	helper.RemoveInstance(p);
 ```
 
+**NOTE:** From version 1.5 ORMi supports multiple SearchKey attributes set. This is due to WMI classes that have composite keys. If there is no ```SearchKey```  set, then a exception will be thrown.
+
 All above operations can also be done asynchronously. For example:
 
  **Add Instance asynchronously:**
