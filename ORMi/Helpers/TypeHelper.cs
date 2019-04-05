@@ -217,6 +217,35 @@ namespace ORMi.Helpers
             return res;
         }
 
+        public static List<WMISearchKey> GetSearchKeys(object p)
+        {
+            List<WMISearchKey> res = new List<WMISearchKey>();
+
+            foreach (PropertyInfo propertyInfo in p.GetType().GetProperties())
+            {
+                WMIIgnore ignoreProp = propertyInfo.GetCustomAttribute<WMIIgnore>();
+
+                if (ignoreProp == null)
+                {
+                    WMIProperty propAtt = propertyInfo.GetCustomAttribute<WMIProperty>();
+
+                    if (propAtt != null)
+                    {
+                        if (propAtt.SearchKey)
+                        {
+                            res.Add(new WMISearchKey
+                            {
+                                Name = propAtt.Name,
+                                Value = propertyInfo.GetValue(p)
+                            });
+                        }
+                    }
+                }
+            }
+
+            return res;
+        }
+
         public static string GetPropertiesToSearch(Type type)
         {
             List<String> res = new List<string>();

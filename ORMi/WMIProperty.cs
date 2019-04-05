@@ -45,4 +45,17 @@ namespace ORMi
     {
 
     }
+
+    public class WMISearchKeyException : Exception
+    {
+        public WMISearchKeyException()
+        {
+
+        }
+
+        public WMISearchKeyException(string message) : base(message)
+        {
+
+        }
+    }
 }

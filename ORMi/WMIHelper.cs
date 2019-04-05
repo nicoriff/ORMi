@@ -65,11 +65,23 @@ namespace ORMi
 
                 string className = TypeHelper.GetClassName(obj);
 
-                WMISearchKey key = TypeHelper.GetSearchKey(obj);
+                string query = String.Format("SELECT * FROM {0}", TypeHelper.GetClassName(obj));
 
-                if (key.Value != null)
+                List<WMISearchKey> keys = TypeHelper.GetSearchKeys(obj);
+
+                if (keys.Count > 0)
                 {
-                    string query = String.Format("SELECT * FROM {0} WHERE {1} = '{2}'", TypeHelper.GetClassName(obj), key.Name, key.Value);
+                    for (int i = 0; i < keys.Count; i++)
+                    {
+                        if (i == 0)
+                        {
+                            query = String.Format("{0} WHERE {1} = '{2}'", query, keys[i].Name, keys[i].Value);
+                        }
+                        else
+                        {
+                            query = String.Format("{0} AND {1} = '{2}'", query, keys[i].Name, keys[i].Value);
+                        }
+                    }
 
                     ManagementObjectSearcher searcher;
                     searcher = new ManagementObjectSearcher(Scope, query);
@@ -99,6 +111,10 @@ namespace ORMi
 
                         m.Put();
                     }
+                }
+                else
+                {
+                    throw new WMISearchKeyException("There is no SearchKey specified for the object");
                 }
             }
             catch (Exception ex)
@@ -188,16 +204,35 @@ namespace ORMi
 
                 string className = TypeHelper.GetClassName(obj);
 
-                WMISearchKey key = TypeHelper.GetSearchKey(obj);
+                string query = String.Format("SELECT * FROM {0}", className);
 
-                string query = String.Format("SELECT * FROM {0} WHERE {1} = '{2}'", className, key.Name, key.Value);
+                List<WMISearchKey> keys = TypeHelper.GetSearchKeys(obj);
 
-                ManagementObjectSearcher searcher;
-                searcher = new ManagementObjectSearcher(Scope, query);
-
-                foreach (ManagementObject m in searcher.Get())
+                if (keys.Count > 0)
                 {
-                    m.Delete();
+                    for (int i = 0; i < keys.Count; i++)
+                    {
+                        if (i == 0)
+                        {
+                            query = String.Format("{0} WHERE {1} = '{2}'", query, keys[i].Name, keys[i].Value);
+                        }
+                        else
+                        {
+                            query = String.Format("{0} AND {1} = '{2}'", query, keys[i].Name, keys[i].Value);
+                        }
+                    }
+
+                    ManagementObjectSearcher searcher;
+                    searcher = new ManagementObjectSearcher(Scope, query);
+
+                    foreach (ManagementObject m in searcher.Get())
+                    {
+                        m.Delete();
+                    }
+                }
+                else
+                {
+                    throw new WMISearchKeyException("There is no SearchKey specified for the object");
                 }
             }
             catch (Exception ex)
