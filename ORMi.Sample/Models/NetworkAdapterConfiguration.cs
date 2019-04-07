@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace ORMi.Sample.Models
 {
     [WMIClass("Win32_NetworkAdapterConfiguration")]
-    public class NetworkAdapterConfiguration
+    public class NetworkAdapterConfiguration : WMIInstance
     {
         public string Caption { get; set; }
         public string Description { get; set; }

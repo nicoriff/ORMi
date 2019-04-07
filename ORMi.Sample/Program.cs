@@ -14,11 +14,11 @@ namespace ORMi.Sample
             WMIHelper helper = new WMIHelper("root\\CimV2");
             //WMIHelper helper = new WMIHelper("root\\CimV2", "NLI7", "nicolas", "superciego");
 
-            List<NetworkAdapterConfiguration> interfaces = helper.Query<NetworkAdapterConfiguration>().ToList();
+            //List<NetworkAdapterConfiguration> interfaces = helper.Query<NetworkAdapterConfiguration>().ToList();
 
-            Printer printer = helper.QueryFirstOrDefault<Printer>();
+            //Printer printer = helper.QueryFirstOrDefault<Printer>();
 
-            List<Printer> printers = helper.Query<Printer>().ToList();
+            //List<Printer> printers = helper.Query<Printer>().ToList();
 
             //foreach (Printer p in printers)
             //{

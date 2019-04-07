@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="Helpers\TypeHelper.cs" />
     <Compile Include="WMIHelper.cs" />
+    <Compile Include="WMIInstance.cs" />
     <Compile Include="WMIMethod.cs" />
     <Compile Include="WMIProperty.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

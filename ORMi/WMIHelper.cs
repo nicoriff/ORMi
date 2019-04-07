@@ -14,6 +14,10 @@ namespace ORMi
     {
         public ManagementScope Scope { get;set; }
 
+        /// <summary>
+        /// Creates a WMIHelper object targeting the desired scope. Default credentials are used.
+        /// </summary>
+        /// <param name="scope">WMI namespace</param>
         public WMIHelper(string scope)
         {
             Scope = new ManagementScope(scope);
@@ -23,6 +27,11 @@ namespace ORMi
             };
         }
 
+        /// <summary>
+        /// Creates a WMIHelper object targeting the desired scope on the specified hostname. Beware that in order to make WMI calls work, the user running the application must have the corresponding privileges on the client machine. Otherwise it will throw an 'Access Denied' exception.
+        /// </summary>
+        /// <param name="scope">WMI namespace</param>
+        /// <param name="hostname">Client machine</param>
         public WMIHelper(string scope, string hostname)
         {
             Scope = new ManagementScope(String.Format("\\\\{0}\\{1}", hostname, scope));
@@ -32,6 +41,13 @@ namespace ORMi
             };
         }
 
+        /// <summary>
+        /// Creates a WMIHelper object targeting the desired scope on the specified hostname with specified credentials.
+        /// </summary>
+        /// <param name="scope">WMI namespace</param>
+        /// <param name="hostname">Client machine</param>
+        /// <param name="username">Username that will make the WMI connection</param>
+        /// <param name="password">The username´s password</param>
         public WMIHelper(string scope, string hostname, string username, string password)
         {
             Scope = new ManagementScope(String.Format("\\\\{0}\\{1}", hostname, scope));
