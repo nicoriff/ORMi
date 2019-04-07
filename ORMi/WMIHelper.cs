@@ -12,11 +12,36 @@ namespace ORMi
 {
     public class WMIHelper
     {
-        public string Scope { get;set; }
+        public ManagementScope Scope { get;set; }
 
         public WMIHelper(string scope)
         {
-            Scope = scope;
+            Scope = new ManagementScope(scope);
+            Scope.Options = new ConnectionOptions
+            {
+                Impersonation = ImpersonationLevel.Impersonate
+            };
+        }
+
+        public WMIHelper(string scope, string hostname)
+        {
+            Scope = new ManagementScope(String.Format("\\\\{0}\\{1}", hostname, scope));
+            Scope.Options = new ConnectionOptions
+            {
+                Impersonation = ImpersonationLevel.Impersonate
+            };
+        }
+
+        public WMIHelper(string scope, string hostname, string username, string password)
+        {
+            Scope = new ManagementScope(String.Format("\\\\{0}\\{1}", hostname, scope));
+            Scope.Options = new ConnectionOptions
+            {
+                Impersonation = ImpersonationLevel.Impersonate,
+                Authentication = AuthenticationLevel.Default,
+                Username = username,
+                Password = password
+            };
         }
 
         #region CRUD Operations
@@ -29,9 +54,9 @@ namespace ORMi
         {
             try
             {
-                WindowsImpersonationContext impersonatedUser = WindowsIdentity.GetCurrent().Impersonate();
+                Scope.Path.ClassName = TypeHelper.GetClassName(obj);
 
-                ManagementClass genericClass = new ManagementClass(Scope, TypeHelper.GetClassName(obj), null);
+                ManagementClass genericClass = new ManagementClass(Scope.Path);
 
                 ManagementObject genericInstance = TypeHelper.GetManagementObject(genericClass, obj);
 
@@ -84,7 +109,7 @@ namespace ORMi
                     }
 
                     ManagementObjectSearcher searcher;
-                    searcher = new ManagementObjectSearcher(Scope, query);
+                    searcher = new ManagementObjectSearcher(Scope, new ObjectQuery(query));
 
                     ManagementObjectCollection col = searcher.Get();
 
@@ -147,7 +172,7 @@ namespace ORMi
                 string className = TypeHelper.GetClassName(obj);
 
                 ManagementObjectSearcher searcher;
-                searcher = new ManagementObjectSearcher(Scope, query);
+                searcher = new ManagementObjectSearcher(Scope, new ObjectQuery(query));
 
                 ManagementObjectCollection col = searcher.Get();
 
@@ -223,7 +248,7 @@ namespace ORMi
                     }
 
                     ManagementObjectSearcher searcher;
-                    searcher = new ManagementObjectSearcher(Scope, query);
+                    searcher = new ManagementObjectSearcher(Scope, new ObjectQuery(query));
 
                     foreach (ManagementObject m in searcher.Get())
                     {
@@ -262,7 +287,7 @@ namespace ORMi
                 WindowsImpersonationContext impersonatedUser = WindowsIdentity.GetCurrent().Impersonate();
 
                 ManagementObjectSearcher searcher;
-                searcher = new ManagementObjectSearcher(Scope, query);
+                searcher = new ManagementObjectSearcher(Scope, new ObjectQuery(query));
 
                 foreach (ManagementObject m in searcher.Get())
                 {
@@ -294,7 +319,7 @@ namespace ORMi
         {
             List<dynamic> res = new List<dynamic>();
 
-            using (ManagementObjectSearcher searcher = new ManagementObjectSearcher(Scope, query))
+            using (ManagementObjectSearcher searcher = new ManagementObjectSearcher(Scope, new ObjectQuery(query)))
             {
                 using (ManagementObjectCollection wmiRes = searcher.Get())
                 {
@@ -332,7 +357,7 @@ namespace ORMi
 
             string query = String.Format("SELECT {0} FROM {1}", TypeHelper.GetPropertiesToSearch(typeof(T)), nombre);
 
-            using (ManagementObjectSearcher searcher = new ManagementObjectSearcher(Scope, query))
+            using (ManagementObjectSearcher searcher = new ManagementObjectSearcher(Scope, new ObjectQuery(query)))
             {
                 using (ManagementObjectCollection wmiRes = searcher.Get())
                 {
@@ -367,7 +392,7 @@ namespace ORMi
         {
             List<T> res = new List<T>();
 
-            using (ManagementObjectSearcher searcher = new ManagementObjectSearcher(Scope, query))
+            using (ManagementObjectSearcher searcher = new ManagementObjectSearcher(Scope, new ObjectQuery(query)))
             {
                 using (ManagementObjectCollection wmiRes = searcher.Get())
                 {
@@ -402,7 +427,7 @@ namespace ORMi
         {
             dynamic res = null;
 
-            using (ManagementObjectSearcher searcher = new ManagementObjectSearcher(Scope, query))
+            using (ManagementObjectSearcher searcher = new ManagementObjectSearcher(Scope, new ObjectQuery(query)))
             {
                 using (ManagementObjectCollection wmiRes = searcher.Get())
                 {
@@ -440,7 +465,7 @@ namespace ORMi
 
             string query = String.Format("SELECT {0} FROM {1}", TypeHelper.GetPropertiesToSearch(typeof(T)), nombre);
 
-            using (ManagementObjectSearcher searcher = new ManagementObjectSearcher(Scope, query))
+            using (ManagementObjectSearcher searcher = new ManagementObjectSearcher(Scope, new ObjectQuery(query)))
             {
                 using (ManagementObjectCollection wmiRes = searcher.Get())
                 {
@@ -475,7 +500,7 @@ namespace ORMi
         {
             object res = null;
 
-            using (ManagementObjectSearcher searcher = new ManagementObjectSearcher(Scope, query))
+            using (ManagementObjectSearcher searcher = new ManagementObjectSearcher(Scope, new ObjectQuery(query)))
             {
                 using (ManagementObjectCollection wmiRes = searcher.Get())
                 {
