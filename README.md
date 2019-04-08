@@ -6,23 +6,20 @@ ORMi is a quite simple Light-ORM to work with WMI (Windows Management Instrument
 
 ORMi is available via [NuGet](https://www.nuget.org/packages/ORMi/). Also, you can always download the latest release on https://github.com/nicoriff/ORMi/releases/.
 
-Once downloaded, you need to add the reference to the library on your project. 
-
-
 ## How to Use
 
-ORMi is just too easy to work with. Let´s for example suppose we want to access 'root\CIMV2' namespace to get the some information about our computer proccesors. 
+ORMi is just too easy to work with. Let's for example suppose we want to access ```root\CIMV2``` namespace to get the some information about our computer proccesors. 
 First of all, we need to use the library:
 
 ```C# 
 using ORMi;
 ```
 
-Then, we´ll define the following class:
+Then, we'll define the following class:
 
 ```C#
     [WMIClass("Win32_Processor")]
-    public class Processor
+    public class Processor : WMIInstance
     {
         public string Name { get; set; }
 
@@ -33,13 +30,23 @@ Then, we´ll define the following class:
     }
 ```
 
-ORMi has some custom attributes to map the model clases to WMI classes. WMI classes usually have tricky or non conventional names that you will for sure not want to use on your class. For solving that problem ORMi just maps the class property name to the WMI property name. If you do not want to use the WMI property name then you can just specify the ```WMIProperty``` attribute ant put the name of the WMI property. The same run for class names. In that case you can make use of ```WMIClass```.
+ORMi has some custom attributes to map the model clases to WMI classes. WMI classes usually have tricky or non conventional names that you will for sure not want to use on your class. For solving that problem ORMi just maps the class property name to the WMI property name. If you do not want to use the WMI property name then you can just specify the ```WMIProperty``` attribute and match it to the name of the WMI property. The same run for class names. In that case you can make use of ```WMIClass``` attribute.
+Note that the class inherits from ``WMIInstance`` class. This is an optional practice from version 2.0. Even if you can not use it, it is recommended as it will be strictly neccesary if you work with WMI methods. If you don't use methods, just don't add the inheritance.
 
-Then if we want to get the machine processors you just do:
+Then, the first thing you got to do is create the ```WMIHelper``` that is the class that you'll use to interact with WMI. You can either create the instance for local use or to use with a remote client. In that case you have to specify credentials or make sure that the user have the corresponding privileges:
 
 ```C#
     WMIHelper helper = new WMIHelper("root\\CimV2");
+```
+Or specifiying client machine and credentials:
 
+```C#
+    WMIHelper helper = new WMIHelper("root\\CimV2", "W2012SRV-WRK", "Administrator", "Password01");
+```
+
+Then you simple query for the data:
+
+```
     List<Processor> processors = helper.Query<Processor>().ToList();
 ```
 This can also be done in async fashion:
@@ -48,7 +55,7 @@ This can also be done in async fashion:
     List<Processor> processors = await helper.QueryAsync<Processor>().ToList();
 ```
 
-If you don´t want to define your model classes the you can also get the result in a `List<dynamic>`
+If you don't want to define your model classes the you can also get the result in a `List<dynamic>`
 
 ```C#
 var devices = helper.Query("SELECT * FROM Win32_PnPEntity");
@@ -117,7 +124,7 @@ As in the update operation, the removal works with the ```SearchKey``` property 
 	helper.RemoveInstance(p);
 ```
 
-**NOTE:** From version 1.5 ORMi supports multiple SearchKey attributes set. This is due to WMI classes that have composite keys. If there is no ```SearchKey```  set, then a exception will be thrown.
+**NOTE:** From version 1.5 ORMi supports multiple ``SearchKey`` attributes set. This is due to WMI classes that have composite keys. If there is no ``SearchKey``  set, then a exception will be thrown.
 
 All above operations can also be done asynchronously. For example:
 
@@ -137,7 +144,7 @@ All above operations can also be done asynchronously. For example:
 
 **Creating an WMI Event Watcher:**
 
-Creating a watcher is one of the simplest tasks in ORMi. Just declare the watcher specifying scope, query and the desired output type and that´s it!. Start receiving events!.
+Creating a watcher is one of the simplest tasks in ORMi. Just declare the watcher specifying scope, query and the desired output type and that's it!. Start receiving events!.
 In this example we are going to watch for new processes created on the system:
 
 First, we define the class:
@@ -183,14 +190,16 @@ watcher.WMIEventArrived += Watcher_WMIEventArrived;
 
 Since version 1.3.0 ORMi supports method working in a quite simple way. WMI defines two types of methods: Instance methods and Static methods.
 
-Static methods are the ones in which you don´t need any instance of a class to run the method. You just call the method and that´s about it. What you will have to do on with ORMi to call the methods you want, is to define them on your model class. This will make a more readable and understandable code, and you will not have to mess with the complexity of having to do all the method calling coding by yourself.
+Static methods are the ones in which you don't need any instance of a class to run the method. You just call the method and that's about it. What you will have to do on with ORMi to call the methods you want, is to define them on your model class. This will make a more readable and understandable code, and you will not have to mess with the complexity of having to do all the method calling coding by yourself.
+
+IMPORTANT: From version 2.0 all classes that have methods declared must inherit from ``WMIInstance``. This is due to the need to use the scope of the instance. If there is no inheritance, the methods will be executed using the current user, and will probably throw an exception if it runs against a remote computer.
 
 **Static Methods:**
 
-Let´s suppose we have a model class that represents an output on a smart card reader. The class will look like this:
+Let's suppose we have a model class that represents an output on a smart card reader. The class will look like this:
 ```C#
     [WMIClass("Lnl_ReaderOutput1")]
-    public class Output
+    public class Output : WMIInstance
     {
         public int PanelID { get; set; }
         public int ReaderID { get; set; }
@@ -238,7 +247,7 @@ Instance methods are a little bit more complicated than static ones. Instance me
 Firstly, we are going to define our class:
 ```C#
 	[WMIClass(Name = "Win32_Printer", Namespace = "root\\CimV2")]
-	public class Printer
+	public class Printer : WMIInstance
 	{
 	    public string DeviceID { get; set; }
 	    public string Name { get; set; }
@@ -252,9 +261,9 @@ Firstly, we are going to define our class:
    ```
 
 Note that we have a `DeviceID` property. This property must always be set on this case because in this case, `DeviceID` is a `CIM_Key` and `Unique` and it is the only unique identifier between instances. If you do not set this property then you will get an exception.
-Also you can note that the parameters are sent using an anonymous object with properties that match the instance method ones. If this properties cannot be mapped the you´ll have an exception.
+Also you can note that the parameters are sent using an anonymous object with properties that match the instance method ones. If this properties cannot be mapped the you'll receive an exception.
 
-Then finally we´ll use it this way:
+Then finally we'll use it this way:
 
 ```C#
 	List<Printer> printers = helper.Query<Printer>().ToList();
