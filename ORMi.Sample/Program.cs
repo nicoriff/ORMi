@@ -12,7 +12,6 @@ namespace ORMi.Sample
         static void Main(string[] args)
         {
             WMIHelper helper = new WMIHelper("root\\CimV2");
-            //WMIHelper helper = new WMIHelper("root\\CimV2", "NLI7", "nicolas", "superciego");
 
             //List<NetworkAdapterConfiguration> interfaces = helper.Query<NetworkAdapterConfiguration>().ToList();
 
