@@ -12,10 +12,11 @@ namespace ORMi.Sample
         static void Main(string[] args)
         {
             WMIHelper helper = new WMIHelper("root\\CimV2");
+            //WMIHelper helper = new WMIHelper("root\\CimV2", "NLI7", "nicolas", "superciego");
 
             //List<NetworkAdapterConfiguration> interfaces = helper.Query<NetworkAdapterConfiguration>().ToList();
 
-            Printer printer = helper.QueryFirstOrDefault<Printer>();
+            //Printer printer = helper.QueryFirstOrDefault<Printer>();
 
             //List<Printer> printers = helper.Query<Printer>().ToList();
 
@@ -34,12 +35,12 @@ namespace ORMi.Sample
 
             //outp.Activate();
 
-            List<Process> processes = helper.QueryAsync<Process>().Result.ToList();
+            List<Process> processes = helper.Query<Process>().ToList();
 
             foreach (Process p in processes)
             {
-                dynamic d = p.GetOwnerSid();
-                ProcessOwner po = p.GetOwner();
+                //dynamic d = p.GetOwnerSid();
+                //ProcessOwner po = p.GetOwner();
                 //int res = p.AttachDebugger();
             }
 

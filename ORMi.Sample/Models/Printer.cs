@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace ORMi.Sample.Models
 {
     [WMIClass(Name = "Win32_Printer", Namespace = "root\\CimV2")]
-    public class Printer
+    public class Printer : WMIInstance
     {
         public string DeviceID { get; set; }
         public string Name { get; set; }

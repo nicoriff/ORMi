@@ -83,6 +83,16 @@ namespace ORMi.Helpers
                     p.SetValue(o, Convert.ChangeType(a, p.PropertyType), null);
                 }
             }
+            else
+            {
+                if (o.GetType().BaseType == typeof(WMIInstance))
+                {
+                    if (p.Name == "Scope")
+                    {
+                        p.SetValue(o, ((ManagementObject)(mo)).Scope);
+                    }
+                }
+            }
         }
 
         public static string GetClassName(object p)
