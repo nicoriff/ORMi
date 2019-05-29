@@ -274,3 +274,61 @@ Then finally we'll use it this way:
 	}
 ```
 The above code will rename all printers to "Newly renamed printer" (be careful! :D)
+
+ORMi can also return and object containing the method execution result. For example let´s take `Win32_Process` class:
+
+We´ll define it as the following:
+
+```C#
+    [WMIClass("Win32_Process")]
+    public class Process : WMIInstance
+    {
+        public int Handle { get; set; }
+        public string Name { get; set; }
+        public int ProcessID { get; set; }
+
+        public dynamic GetOwnerSid()
+        {
+            return WMIMethod.ExecuteMethod(this);
+        }
+
+        public ProcessOwner GetOwner()
+        {
+            return WMIMethod.ExecuteMethod<ProcessOwner>(this);
+        }
+
+        public int AttachDebugger()
+        {
+            return WMIMethod.ExecuteMethod<int>(this);
+        }
+    }
+```
+
+Note that `GetOwner()` implementation specifies a `ProcesOwner` type.   If you check WMI docs on `Win32_Processor` class for `GetOwner` method, you´ll see the following definition:
+
+    uint32 GetOwner(
+      [out] string User,
+      [out] string Domain
+    );
+
+So you will have to define the following structure to retrieve the result in a beautiful way:
+
+```C#
+    public class ProcessOwner
+    {
+        public string Domain { get; set; }
+        public int ReturnValue { get; set; }
+        public string User { get; set; }
+    }
+```
+
+So, finally, you would do the following:
+
+```C#
+    List<Process> processes = helper.Query<Process>().ToList();
+
+    foreach (Process p in processes)
+    {
+        ProcessOwner po = p.GetOwner();
+    }
+```
