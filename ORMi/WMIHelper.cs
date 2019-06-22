@@ -102,27 +102,108 @@ namespace ORMi
         {
             try
             {
-                WindowsImpersonationContext impersonatedUser = WindowsIdentity.GetCurrent().Impersonate();
+                WindowsIdentity windowsIdentity = WindowsIdentity.GetCurrent();
 
-                string className = TypeHelper.GetClassName(obj);
-
-                string query = String.Format("SELECT * FROM {0}", TypeHelper.GetClassName(obj));
-
-                List<WMISearchKey> keys = TypeHelper.GetSearchKeys(obj);
-
-                if (keys.Count > 0)
+#if NET45
+                WindowsImpersonationContext impersonatedUser = windowsIdentity.Impersonate();
+#endif
+#if NETSTANDARD20
+                WindowsIdentity.RunImpersonated(windowsIdentity.AccessToken, () =>
+#endif
                 {
-                    for (int i = 0; i < keys.Count; i++)
+                    string className = TypeHelper.GetClassName(obj);
+
+                    string query = String.Format("SELECT * FROM {0}", TypeHelper.GetClassName(obj));
+
+                    List<WMISearchKey> keys = TypeHelper.GetSearchKeys(obj);
+
+                    if (keys.Count > 0)
                     {
-                        if (i == 0)
+                        for (int i = 0; i < keys.Count; i++)
                         {
-                            query = String.Format("{0} WHERE {1} = '{2}'", query, keys[i].Name, keys[i].Value);
+                            if (i == 0)
+                            {
+                                query = String.Format("{0} WHERE {1} = '{2}'", query, keys[i].Name, keys[i].Value);
+                            }
+                            else
+                            {
+                                query = String.Format("{0} AND {1} = '{2}'", query, keys[i].Name, keys[i].Value);
+                            }
                         }
-                        else
+
+                        ManagementObjectSearcher searcher;
+                        searcher = new ManagementObjectSearcher(Scope, new ObjectQuery(query));
+
+                        ManagementObjectCollection col = searcher.Get();
+
+                        foreach (ManagementObject m in searcher.Get())
                         {
-                            query = String.Format("{0} AND {1} = '{2}'", query, keys[i].Name, keys[i].Value);
+                            foreach (PropertyInfo p in obj.GetType().GetProperties())
+                            {
+                                WMIIgnore ignoreProp = p.GetCustomAttribute<WMIIgnore>();
+
+                                if (ignoreProp == null)
+                                {
+                                    WMIProperty propAtt = p.GetCustomAttribute<WMIProperty>();
+
+                                    if (propAtt != null)
+                                    {
+                                        m[propAtt.Name] = p.GetValue(obj).GetType() == typeof(DateTime) ? ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(p.GetValue(obj))) : p.GetValue(obj);
+                                    }
+                                    else
+                                    {
+                                        m[p.Name] = p.GetValue(obj).GetType() == typeof(DateTime) ? ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(p.GetValue(obj))) : p.GetValue(obj);
+                                    }
+                                }
+                            }
+
+                            m.Put();
                         }
                     }
+                    else
+                    {
+                        throw new WMISearchKeyException("There is no SearchKey specified for the object");
+                    }
+                }
+#if NETSTANDARD20
+                );
+#endif
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        /// <summary>
+        /// Modifies an existing instance asynchonously.
+        /// </summary>
+        /// <param name="obj">Object to be updated. ORMi will search the property with the SearchKey attribute. That value is going to be used to make the update.</param>
+        /// <returns></returns>
+        public async Task UpdateInstanceAsync(object obj)
+        {
+            await Task.Run(() => UpdateInstance(obj));
+        }
+
+        /// <summary>
+        /// Modifies an existing instance based on a custom query.
+        /// </summary>
+        /// <param name="obj">Object to be updated</param>
+        /// <param name="query">Query to be run against WMI. The resulting instances will be updated</param>
+        public void UpdateInstance(object obj, string query)
+        {
+            try
+            {
+                WindowsIdentity windowsIdentity = WindowsIdentity.GetCurrent();
+
+#if NET45
+                WindowsImpersonationContext impersonatedUser = windowsIdentity.Impersonate();
+#endif
+#if NETSTANDARD20
+                WindowsIdentity.RunImpersonated(windowsIdentity.AccessToken, () =>
+#endif
+                {
+                    string className = TypeHelper.GetClassName(obj);
 
                     ManagementObjectSearcher searcher;
                     searcher = new ManagementObjectSearcher(Scope, new ObjectQuery(query));
@@ -153,68 +234,9 @@ namespace ORMi
                         m.Put();
                     }
                 }
-                else
-                {
-                    throw new WMISearchKeyException("There is no SearchKey specified for the object");
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        /// <summary>
-        /// Modifies an existing instance asynchonously.
-        /// </summary>
-        /// <param name="obj">Object to be updated. ORMi will search the property with the SearchKey attribute. That value is going to be used to make the update.</param>
-        /// <returns></returns>
-        public async Task UpdateInstanceAsync(object obj)
-        {
-            await Task.Run(() => UpdateInstance(obj));
-        }
-
-        /// <summary>
-        /// Modifies an existing instance based on a custom query.
-        /// </summary>
-        /// <param name="obj">Object to be updated</param>
-        /// <param name="query">Query to be run against WMI. The resulting instances will be updated</param>
-        public void UpdateInstance(object obj, string query)
-        {
-            try
-            {
-                WindowsImpersonationContext impersonatedUser = WindowsIdentity.GetCurrent().Impersonate();
-
-                string className = TypeHelper.GetClassName(obj);
-
-                ManagementObjectSearcher searcher;
-                searcher = new ManagementObjectSearcher(Scope, new ObjectQuery(query));
-
-                ManagementObjectCollection col = searcher.Get();
-
-                foreach (ManagementObject m in searcher.Get())
-                {
-                    foreach (PropertyInfo p in obj.GetType().GetProperties())
-                    {
-                        WMIIgnore ignoreProp = p.GetCustomAttribute<WMIIgnore>();
-
-                        if (ignoreProp == null)
-                        {
-                            WMIProperty propAtt = p.GetCustomAttribute<WMIProperty>();
-
-                            if (propAtt != null)
-                            {
-                                m[propAtt.Name] = p.GetValue(obj).GetType() == typeof(DateTime) ? ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(p.GetValue(obj))) : p.GetValue(obj);
-                            }
-                            else
-                            {
-                                m[p.Name] = p.GetValue(obj).GetType() == typeof(DateTime) ? ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(p.GetValue(obj))) : p.GetValue(obj);
-                            }
-                        }
-                    }
-
-                    m.Put();
-                }
+#if NETSTANDARD20
+                );
+#endif
             }
             catch (Exception ex)
             {
@@ -241,40 +263,51 @@ namespace ORMi
         {
             try
             {
-                WindowsImpersonationContext impersonatedUser = WindowsIdentity.GetCurrent().Impersonate();
+                WindowsIdentity windowsIdentity = WindowsIdentity.GetCurrent();
 
-                string className = TypeHelper.GetClassName(obj);
-
-                string query = String.Format("SELECT * FROM {0}", className);
-
-                List<WMISearchKey> keys = TypeHelper.GetSearchKeys(obj);
-
-                if (keys.Count > 0)
+#if NET45
+                WindowsImpersonationContext impersonatedUser = windowsIdentity.Impersonate();
+#endif
+#if NETSTANDARD20
+                WindowsIdentity.RunImpersonated(windowsIdentity.AccessToken, () =>
+#endif
                 {
-                    for (int i = 0; i < keys.Count; i++)
+                    string className = TypeHelper.GetClassName(obj);
+
+                    string query = String.Format("SELECT * FROM {0}", className);
+
+                    List<WMISearchKey> keys = TypeHelper.GetSearchKeys(obj);
+
+                    if (keys.Count > 0)
                     {
-                        if (i == 0)
+                        for (int i = 0; i < keys.Count; i++)
                         {
-                            query = String.Format("{0} WHERE {1} = '{2}'", query, keys[i].Name, keys[i].Value);
+                            if (i == 0)
+                            {
+                                query = String.Format("{0} WHERE {1} = '{2}'", query, keys[i].Name, keys[i].Value);
+                            }
+                            else
+                            {
+                                query = String.Format("{0} AND {1} = '{2}'", query, keys[i].Name, keys[i].Value);
+                            }
                         }
-                        else
+
+                        ManagementObjectSearcher searcher;
+                        searcher = new ManagementObjectSearcher(Scope, new ObjectQuery(query));
+
+                        foreach (ManagementObject m in searcher.Get())
                         {
-                            query = String.Format("{0} AND {1} = '{2}'", query, keys[i].Name, keys[i].Value);
+                            m.Delete();
                         }
                     }
-
-                    ManagementObjectSearcher searcher;
-                    searcher = new ManagementObjectSearcher(Scope, new ObjectQuery(query));
-
-                    foreach (ManagementObject m in searcher.Get())
+                    else
                     {
-                        m.Delete();
+                        throw new WMISearchKeyException("There is no SearchKey specified for the object");
                     }
                 }
-                else
-                {
-                    throw new WMISearchKeyException("There is no SearchKey specified for the object");
-                }
+#if NETSTANDARD20
+                );
+#endif
             }
             catch (Exception ex)
             {
@@ -300,15 +333,26 @@ namespace ORMi
         {
             try
             {
-                WindowsImpersonationContext impersonatedUser = WindowsIdentity.GetCurrent().Impersonate();
+                WindowsIdentity windowsIdentity = WindowsIdentity.GetCurrent();
 
-                ManagementObjectSearcher searcher;
-                searcher = new ManagementObjectSearcher(Scope, new ObjectQuery(query));
-
-                foreach (ManagementObject m in searcher.Get())
+#if NET45
+                WindowsImpersonationContext impersonatedUser = windowsIdentity.Impersonate();
+#endif
+#if NETSTANDARD20
+                WindowsIdentity.RunImpersonated(windowsIdentity.AccessToken, () =>
+#endif
                 {
-                    m.Delete();
+                    ManagementObjectSearcher searcher;
+                    searcher = new ManagementObjectSearcher(Scope, new ObjectQuery(query));
+
+                    foreach (ManagementObject m in searcher.Get())
+                    {
+                        m.Delete();
+                    }
                 }
+#if NETSTANDARD20
+                );
+#endif
             }
             catch (Exception ex)
             {
@@ -543,7 +587,7 @@ namespace ORMi
         }
 
 
-        #endregion
+#endregion
 
     }
 }
