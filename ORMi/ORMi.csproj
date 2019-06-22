@@ -14,6 +14,12 @@
     <PackageReleaseNotes>A Light-ORM for accesing WMI</PackageReleaseNotes>
     <PackageTags>WMI ORM ORMi</PackageTags>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net45'">
+    <DefineConstants>NET45</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <DefineConstants>NETSTANDARD20</DefineConstants>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="System.Dynamic.Runtime" Version="4.3.0" />
     <PackageReference Include="System.Management" Version="4.*" />
