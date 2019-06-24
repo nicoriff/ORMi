@@ -125,11 +125,18 @@ namespace ORMi.Helpers
 
         public static string GetNamespace(object o)
         {
-            var dnAttribute = o.GetType().GetCustomAttribute<WMIClass>(true);
-
-            if (dnAttribute != null)
+            if (o.GetType().IsSubclassOf(typeof(WMIInstance)))
             {
-                return dnAttribute.Namespace;
+                return ((WMIInstance)(o)).Scope.Path.NamespacePath;
+            }
+            else
+            {
+                var dnAttribute = o.GetType().GetCustomAttribute<WMIClass>(true);
+
+                if (dnAttribute != null)
+                {
+                    return dnAttribute.Namespace;
+                }
             }
 
             return null;

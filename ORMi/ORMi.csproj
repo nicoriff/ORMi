@@ -21,6 +21,17 @@
     <DefineConstants>NETSTANDARD20</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="nuget.exe" />
+    <None Remove="ORMi.1.0.1.nupkg" />
+    <None Remove="ORMi.1.0.2.nupkg" />
+    <None Remove="ORMi.1.3.2.nupkg" />
+    <None Remove="ORMi.1.3.4.2.nupkg" />
+    <None Remove="ORMi.1.3.4.nupkg" />
+    <None Remove="ORMi.1.4.1.nupkg" />
+    <None Remove="ORMi.1.4.2.nupkg" />
+    <None Remove="ORMi.1.5.0.nupkg" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="System.Dynamic.Runtime" Version="4.3.0" />
     <PackageReference Include="System.Management" Version="4.*" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.*" />

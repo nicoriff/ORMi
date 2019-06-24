@@ -31,6 +31,8 @@ namespace ORMi
         {
             Name = name;
         }
+
+        [Obsolete("Since 2.0.0 version the namespace should not longer be specified this way. Inherit from WMIInstance instead.")]
         public WMIClass(string name, string wmiNamespace)
         {
             Name = name;

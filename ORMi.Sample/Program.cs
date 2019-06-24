@@ -39,7 +39,7 @@ namespace ORMi.Sample
             foreach (Process p in processes)
             {
                 //dynamic d = p.GetOwnerSid();
-                //ProcessOwner po = p.GetOwner();
+                ProcessOwner po = p.GetOwner();
                 //int res = p.AttachDebugger();
             }
 

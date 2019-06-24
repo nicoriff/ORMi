@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace ORMi.Sample.Models
 {
     [WMIClass(Name = "Win32_Process", Namespace = "root\\CimV2")]
-    public class Process
+    public class Process : WMIInstance
     {
         public int Handle { get; set; }
         public string Name { get; set; }
