@@ -80,7 +80,13 @@ namespace ORMi.Helpers
                 }
                 else
                 {
-                    p.SetValue(o, Convert.ChangeType(a, p.PropertyType), null);
+                    var propertyType = p.PropertyType;
+                    if (propertyType.IsGenericType &&
+                        propertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+                    {
+                        propertyType = propertyType.GetGenericArguments()[0];
+                    }
+                    p.SetValue(o, Convert.ChangeType(a, propertyType), null);
                 }
             }
             else
