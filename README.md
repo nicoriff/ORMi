@@ -46,7 +46,7 @@ Or specifiying client machine and credentials:
 
 Then you simple query for the data:
 
-```
+```C#
     List<Processor> processors = helper.Query<Processor>().ToList();
 ```
 This can also be done in async fashion:
@@ -58,12 +58,12 @@ This can also be done in async fashion:
 If you don't want to define your model classes the you can also get the result in a `List<dynamic>`
 
 ```C#
-var devices = helper.Query("SELECT * FROM Win32_PnPEntity");
+	var devices = helper.Query("SELECT * FROM Win32_PnPEntity");
 ```
 You can also search for single instances:
 
 ```C#
-Printer printer = helper.QueryFirstOrDefault<Printer>();
+	Printer printer = helper.QueryFirstOrDefault<Printer>();
 ```
 
 ## Create, Update and Delete:
@@ -90,15 +90,15 @@ Examples:
  **Add Instance:**
  
 ```C#
-	 Person person = new Person
-	 {
-	     FirstName = "John",
-	     Lastname = "Doe",
-	     DocumentNumber = "9995",
-	     Segment = -1
-	 };
+	Person person = new Person
+	{
+	    FirstName = "John",
+	    Lastname = "Doe",
+	    DocumentNumber = "9995",
+	    Segment = -1
+	};
 
-	 helper.AddInstance(person);
+	helper.AddInstance(person);
 ```
 
 **Update Instance:**
@@ -106,11 +106,11 @@ Examples:
 For the Update operation, the class must have the ```WmiProperty``` attribute declared with the ```SearchKey``` property properly set to true. This will use the property with the ```SearchKey``` to get the instance that is going to be updated. For example:
 
 ```C#
-      Person person= helper.Query<Person>("SELECT * FROM Lnl_Cardholder WHERE LASTNAME = 'Doe'").SingleOrDefault();
+	Person person= helper.Query<Person>("SELECT * FROM Lnl_Cardholder WHERE LASTNAME = 'Doe'").SingleOrDefault();
 
-      person.Lastname = "Doe Modified";
+	person.Lastname = "Doe Modified";
 
-      helper.UpdateInstance(person);
+	helper.UpdateInstance(person);
 ```
 	
 In the above example, ORMi is going to look for the person with SSNO = 9995 and update that instance with the properties set on ```person``` instance.

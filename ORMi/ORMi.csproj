@@ -31,6 +31,8 @@
     <None Remove="ORMi.1.4.2.nupkg" />
     <None Remove="ORMi.1.5.0.nupkg" />
     <None Remove="ORMi.2.5.0.nupkg" />
+    <None Remove="ORMi.2.5.1.2.nupkg" />
+    <None Remove="ORMi.2.5.1.nupkg" />
     <None Remove="ORMi.nuspec" />
   </ItemGroup>
   <ItemGroup>
