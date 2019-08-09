@@ -48,6 +48,11 @@ namespace ORMi
 
     }
 
+    public class WMIIgnoreOnUpdate : Attribute
+    {
+
+    }
+
     public class WMISearchKeyException : Exception
     {
         public WMISearchKeyException()
