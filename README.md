@@ -82,6 +82,9 @@ For adding, updating and deleting instances we are going to use a custom namespa
 
         [WMIProperty("PRIMARYSEGMENTID")]
         public int Segment { get; set; }
+
+		[WMIIgnore]
+		public string City { get; set; }
     }
  ```
    
@@ -182,8 +185,8 @@ And then, just handle the events...
 Or you can just not define any Type to return and ORMi will return a dynamic object containing all the WMI properties for the WMI instance:
 
 ```C#
-WMIWatcher watcher = new WMIWatcher("root\\CimV2", "SELECT * FROM Win32_ProcessStartTrace");
-watcher.WMIEventArrived += Watcher_WMIEventArrived;
+	WMIWatcher watcher = new WMIWatcher("root\\CimV2", "SELECT * FROM Win32_ProcessStartTrace");
+	watcher.WMIEventArrived += Watcher_WMIEventArrived;
 ```
 
 ## Methods
