@@ -140,19 +140,22 @@ namespace ORMi
                         {
                             foreach (PropertyInfo p in obj.GetType().GetProperties())
                             {
-                                WMIIgnore ignoreProp = p.GetCustomAttribute<WMIIgnore>();
-
-                                if (ignoreProp == null)
+                                if (p.GetValue(obj) != null)
                                 {
-                                    WMIProperty propAtt = p.GetCustomAttribute<WMIProperty>();
+                                    WMIIgnore ignoreProp = p.GetCustomAttribute<WMIIgnore>();
 
-                                    if (propAtt != null)
+                                    if (ignoreProp == null)
                                     {
-                                        m[propAtt.Name] = p.GetValue(obj).GetType() == typeof(DateTime) ? ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(p.GetValue(obj))) : p.GetValue(obj);
-                                    }
-                                    else
-                                    {
-                                        m[p.Name] = p.GetValue(obj).GetType() == typeof(DateTime) ? ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(p.GetValue(obj))) : p.GetValue(obj);
+                                        WMIProperty propAtt = p.GetCustomAttribute<WMIProperty>();
+
+                                        if (propAtt != null)
+                                        {
+                                            m[propAtt.Name] = p.GetValue(obj).GetType() == typeof(DateTime) ? ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(p.GetValue(obj))) : p.GetValue(obj);
+                                        }
+                                        else
+                                        {
+                                            m[p.Name] = p.GetValue(obj).GetType() == typeof(DateTime) ? ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(p.GetValue(obj))) : p.GetValue(obj);
+                                        }
                                     }
                                 }
                             }
@@ -218,15 +221,18 @@ namespace ORMi
 
                             if (ignoreProp == null)
                             {
-                                WMIProperty propAtt = p.GetCustomAttribute<WMIProperty>();
+                                if (p.GetValue(obj) != null)
+                                {
+                                    WMIProperty propAtt = p.GetCustomAttribute<WMIProperty>();
 
-                                if (propAtt != null)
-                                {
-                                    m[propAtt.Name] = p.GetValue(obj).GetType() == typeof(DateTime) ? ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(p.GetValue(obj))) : p.GetValue(obj);
-                                }
-                                else
-                                {
-                                    m[p.Name] = p.GetValue(obj).GetType() == typeof(DateTime) ? ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(p.GetValue(obj))) : p.GetValue(obj);
+                                    if (propAtt != null)
+                                    {
+                                        m[propAtt.Name] = p.GetValue(obj).GetType() == typeof(DateTime) ? ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(p.GetValue(obj))) : p.GetValue(obj);
+                                    }
+                                    else
+                                    {
+                                        m[p.Name] = p.GetValue(obj).GetType() == typeof(DateTime) ? ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(p.GetValue(obj))) : p.GetValue(obj);
+                                    }
                                 }
                             }
                         }

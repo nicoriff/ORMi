@@ -175,32 +175,35 @@ namespace ORMi.Helpers
 
             foreach (PropertyInfo propertyInfo in obj.GetType().GetProperties())
             {
-                WMIIgnore ignoreProp = propertyInfo.GetCustomAttribute<WMIIgnore>();
-
-                if (ignoreProp == null)
+                if (propertyInfo.GetValue(obj) != null)
                 {
-                    WMIProperty propAtt = propertyInfo.GetCustomAttribute<WMIProperty>();
+                    WMIIgnore ignoreProp = propertyInfo.GetCustomAttribute<WMIIgnore>();
 
-                    if (propAtt == null)
+                    if (ignoreProp == null)
                     {
-                        if (propertyInfo.GetValue(obj).GetType() == typeof(DateTime))
+                        WMIProperty propAtt = propertyInfo.GetCustomAttribute<WMIProperty>();
+
+                        if (propAtt == null)
                         {
-                            genericInstance[propertyInfo.Name.ToUpper()] = ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(propertyInfo.GetValue(obj)));
+                            if (propertyInfo.GetValue(obj).GetType() == typeof(DateTime))
+                            {
+                                genericInstance[propertyInfo.Name.ToUpper()] = ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(propertyInfo.GetValue(obj)));
+                            }
+                            else
+                            {
+                                genericInstance[propertyInfo.Name.ToUpper()] = propertyInfo.GetValue(obj);
+                            }
                         }
                         else
                         {
-                            genericInstance[propertyInfo.Name.ToUpper()] = propertyInfo.GetValue(obj);
-                        }
-                    }
-                    else
-                    {
-                        if (propertyInfo.GetValue(obj).GetType() == typeof(DateTime))
-                        {
-                            genericInstance[propAtt.Name.ToUpper()] = ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(propertyInfo.GetValue(obj)));
-                        }
-                        else
-                        {
-                            genericInstance[propAtt.Name.ToUpper()] = propertyInfo.GetValue(obj);
+                            if (propertyInfo.GetValue(obj).GetType() == typeof(DateTime))
+                            {
+                                genericInstance[propAtt.Name.ToUpper()] = ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(propertyInfo.GetValue(obj)));
+                            }
+                            else
+                            {
+                                genericInstance[propAtt.Name.ToUpper()] = propertyInfo.GetValue(obj);
+                            }
                         }
                     }
                 }

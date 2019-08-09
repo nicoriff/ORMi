@@ -34,14 +34,14 @@ namespace ORMi.Sample
 
             //outp.Activate();
 
-            List<Process> processes = helper.Query<Process>().ToList();
+            //List<Process> processes = helper.Query<Process>().ToList();
 
-            foreach (Process p in processes)
-            {
-                //dynamic d = p.GetOwnerSid();
-                ProcessOwner po = p.GetOwner();
-                //int res = p.AttachDebugger();
-            }
+            //foreach (Process p in processes)
+            //{
+            //    //dynamic d = p.GetOwnerSid();
+            //    ProcessOwner po = p.GetOwner();
+            //    //int res = p.AttachDebugger();
+            //}
 
             //var dynDevices = helper.Query("SELECT * FROM Win32_PnPEntity");
 
@@ -58,16 +58,13 @@ namespace ORMi.Sample
             //    Console.WriteLine(d.Name);
             //}
 
-            //Person person = new Person
-            //{
-            //    FirstName = "John",
-            //    Lastname = "Doe",
-            //    DocumentNumber = "9995",
-            //    Segment = -1,
-            //    Age = 43
-            //};
+            Person person = new Person
+            {
+                FirstName = "John",
+                DocumentNumber = "9995",
+            };
 
-            //helper.AddInstance(person);
+            helper.AddInstance(person);
 
             //Person queryPersonSingle = helper.Query<Person>("SELECT * FROM Lnl_Cardholder WHERE LASTNAME = 'Doe Modified'").SingleOrDefault();
 
