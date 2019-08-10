@@ -218,6 +218,7 @@ namespace ORMi
                     {
                         foreach (PropertyInfo p in obj.GetType().GetProperties())
                         {
+                            WMIIgnore ignoreProp = p.GetCustomAttribute<WMIIgnore>();
                             WMIIgnoreOnUpdate ignoreOnUpdateProp = p.GetCustomAttribute<WMIIgnoreOnUpdate>();
 
                             if (ignoreProp == null && ignoreOnUpdateProp == null)
