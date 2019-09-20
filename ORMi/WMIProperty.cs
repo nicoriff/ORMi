@@ -48,6 +48,11 @@ namespace ORMi
 
     }
 
+    public class WMIIgnoreOnInsert : Attribute
+    {
+
+    }
+
     public class WMIIgnoreOnUpdate : Attribute
     {
 

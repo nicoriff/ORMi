@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Dynamic;
 using System.Linq;
 using System.Management;
@@ -162,6 +163,8 @@ namespace ORMi.Helpers
 
         public static ManagementObject GetManagementObject(ManagementClass sourceClass, object obj)
         {
+            var caller = new StackTrace().GetFrame(1).GetMethod().DeclaringType.Name;
+
             ManagementObject genericInstance;
             try
             {
@@ -178,8 +181,9 @@ namespace ORMi.Helpers
                 if (propertyInfo.GetValue(obj) != null)
                 {
                     WMIIgnore ignoreProp = propertyInfo.GetCustomAttribute<WMIIgnore>();
+                    WMIIgnoreOnInsert ignoreOnInsert = propertyInfo.GetCustomAttribute<WMIIgnoreOnInsert>();
 
-                    if (ignoreProp == null)
+                    if (ignoreProp == null && ((caller == "WMIHelper" ? (ignoreOnInsert == null ? true : false) : true)))
                     {
                         WMIProperty propAtt = propertyInfo.GetCustomAttribute<WMIProperty>();
 
