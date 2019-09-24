@@ -49,22 +49,22 @@ namespace ORMi.Sample
 
             //List<Processor> procesors = helper.Query<Processor>().ToList();
 
-            //List<Device> devices = helper.Query<Device>().ToList()
-            //    .Where(p => (p.Name ?? "")
-            //    .Contains("Intel")).ToList();
+            List<Device> devices = helper.Query<Device>().ToList()
+                .Where(p => (p.Name ?? "")
+                .Contains("Intel")).ToList();
 
-            //foreach (Device d in devices)
-            //{
-            //    Console.WriteLine(d.Name);
-            //}
-
-            Person person = new Person
+            foreach (Device d in devices)
             {
-                FirstName = "John",
-                DocumentNumber = "9995",
-            };
+                Console.WriteLine(d.Name);
+            }
 
-            helper.AddInstance(person);
+            //Person person = new Person
+            //{
+            //    FirstName = "John",
+            //    DocumentNumber = "9995",
+            //};
+
+            //helper.AddInstance(person);
 
             //Person queryPersonSingle = helper.Query<Person>("SELECT * FROM Lnl_Cardholder WHERE LASTNAME = 'Doe Modified'").SingleOrDefault();
 

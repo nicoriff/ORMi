@@ -9,7 +9,10 @@ namespace ORMi.Sample.Models
     [WMIClass("Lnl_CardHolder")]
     public class Person
     {
+        [WMIIgnoreOnUpdate]
         public string Lastname { get; set; }
+
+        [WMIIgnore]
         public string FirstName { get; set; }
 
         [WMIProperty( Name = "SSNO", SearchKey = true)]
