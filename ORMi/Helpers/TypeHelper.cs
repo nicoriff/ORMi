@@ -79,6 +79,26 @@ namespace ORMi.Helpers
                 {
                     p.SetValue(o, ManagementDateTimeConverter.ToDateTime((string)a), null);
                 }
+                else if (a is ManagementBaseObject b)
+                {
+                    var classAtt = p.PropertyType.GetCustomAttribute<WMIClass>();
+
+                    string className = String.Empty;
+
+                    if (classAtt != null)
+                    {
+                        className = classAtt.Name;
+                    }
+                    else
+                    {
+                        className = p.PropertyType.Name;
+                    }
+
+                    if (className == b.ClassPath.ClassName)
+                    {
+                        p.SetValue(o, LoadObject(b, p.PropertyType), null);
+                    }
+                }
                 else
                 {
                     var propertyType = p.PropertyType;
