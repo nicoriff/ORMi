@@ -3,6 +3,7 @@ using NUnit.Framework;
 using Models = ORMi.Sample.Models;
 using System;
 using System.Linq;
+using System.Security.Principal;
 
 namespace ORMi.Tests
 {
@@ -97,6 +98,28 @@ namespace ORMi.Tests
             queryPersonSingle = _Helper.Query<Models.Person>("SELECT * FROM Lnl_Cardholder WHERE LASTNAME = 'Doe Modified'").SingleOrDefault();
 
             Assert.IsNotNull(queryPersonSingle, "John Doe Modified still couldn't be found.");
+        }
+
+        [Test]
+        public void TestRecursiveQuery_UserProfiles()
+        {
+            var profile = _Helper.Query<Models.UserProfile>("SELECT * FROM Win32_UserProfile WHERE Loaded = 'True'")
+                .Where(p => p.SID == WindowsIdentity.GetCurrent().User.Value).SingleOrDefault();
+
+            Assert.AreEqual(WindowsIdentity.GetCurrent().User.Value, profile.SID);
+            Assert.IsNotNull(profile.AppDataRoaming);
+            Assert.IsNotNull(profile.Contacts);
+            Assert.IsNotNull(profile.Desktop);
+            Assert.IsNotNull(profile.Documents);
+            Assert.IsNotNull(profile.Downloads);
+            Assert.IsNotNull(profile.Favorites);
+            Assert.IsNotNull(profile.Links);
+            Assert.IsNotNull(profile.Music);
+            Assert.IsNotNull(profile.Pictures);
+            Assert.IsNotNull(profile.SavedGames);
+            Assert.IsNotNull(profile.Searches);
+            Assert.IsNotNull(profile.StartMenu);
+            Assert.IsNotNull(profile.Videos);
         }
     }
 }
