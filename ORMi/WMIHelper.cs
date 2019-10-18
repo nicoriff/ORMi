@@ -42,6 +42,23 @@ namespace ORMi
         }
 
         /// <summary>
+        /// Creates a WMIHelper object targeting the desired scope on the specified hostname with a domain to use when authorizing WMI calls on the client machine.
+        /// Beware that in order to make WMI calls work, the user running the application must have the corresponding privileges on the client machine. Otherwise it will throw an 'Access Denied' exception.
+        /// </summary>
+        /// <param name="scope"></param>
+        /// <param name="hostname"></param>
+        /// <param name="domain"></param>
+        public WMIHelper(string scope, string hostname, string domain)
+        {
+            Scope = new ManagementScope(String.Format("\\\\{0}\\{1}", hostname, scope));
+            Scope.Options = new ConnectionOptions
+            {
+                Impersonation = ImpersonationLevel.Impersonate,
+                Authority = $"ntlmdomain:{domain}"
+            };
+        }
+
+        /// <summary>
         /// Creates a WMIHelper object targeting the desired scope on the specified hostname with specified credentials.
         /// </summary>
         /// <param name="scope">WMI namespace</param>
