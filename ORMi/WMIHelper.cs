@@ -28,16 +28,18 @@ namespace ORMi
         }
 
         /// <summary>
-        /// Creates a WMIHelper object targeting the desired scope on the specified hostname. Beware that in order to make WMI calls work, the user running the application must have the corresponding privileges on the client machine. Otherwise it will throw an 'Access Denied' exception.
+        /// Creates a WMIHelper object targeting the desired scope on the specified hostname with optional authentication level. Beware that in order to make WMI calls work, the user running the application must have the corresponding privileges on the client machine. Otherwise it will throw an 'Access Denied' exception.
         /// </summary>
         /// <param name="scope">WMI namespace</param>
         /// <param name="hostname">Client machine</param>
-        public WMIHelper(string scope, string hostname)
+        /// <param name="auth">Athentication level</param>
+        public WMIHelper(string scope, string hostname, AuthenticationLevel auth = AuthenticationLevel.Default)
         {
             Scope = new ManagementScope(String.Format("\\\\{0}\\{1}", hostname, scope));
             Scope.Options = new ConnectionOptions
             {
-                Impersonation = ImpersonationLevel.Impersonate
+                Impersonation = ImpersonationLevel.Impersonate,
+                Authentication = auth
             };
         }
 
@@ -48,12 +50,14 @@ namespace ORMi
         /// <param name="scope"></param>
         /// <param name="hostname"></param>
         /// <param name="domain"></param>
-        public WMIHelper(string scope, string hostname, string domain)
+        /// <param name="auth">Athentication level</param>
+        public WMIHelper(string scope, string hostname, string domain, AuthenticationLevel auth = AuthenticationLevel.Default)
         {
             Scope = new ManagementScope(String.Format("\\\\{0}\\{1}", hostname, scope));
             Scope.Options = new ConnectionOptions
             {
                 Impersonation = ImpersonationLevel.Impersonate,
+                Authentication = auth,
                 Authority = $"ntlmdomain:{domain}"
             };
         }
@@ -65,13 +69,14 @@ namespace ORMi
         /// <param name="hostname">Client machine</param>
         /// <param name="username">Username that will make the WMI connection</param>
         /// <param name="password">The username´s password</param>
-        public WMIHelper(string scope, string hostname, string username, string password)
+        /// <param name="auth">Athentication level</param>
+        public WMIHelper(string scope, string hostname, string username, string password, AuthenticationLevel auth = AuthenticationLevel.Default)
         {
             Scope = new ManagementScope(String.Format("\\\\{0}\\{1}", hostname, scope));
             Scope.Options = new ConnectionOptions
             {
                 Impersonation = ImpersonationLevel.Impersonate,
-                Authentication = AuthenticationLevel.Default,
+                Authentication = auth,
                 Username = username,
                 Password = password
             };
