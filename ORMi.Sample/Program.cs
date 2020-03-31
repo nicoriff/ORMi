@@ -13,6 +13,9 @@ namespace ORMi.Sample
         {
             WMIHelper helper = new WMIHelper("root\\CimV2");
 
+            Process p = new Process();
+            p.Create("C:/Windows/notepad.exe", null, null);
+
             //List<NetworkAdapterConfiguration> interfaces = helper.Query<NetworkAdapterConfiguration>().ToList();
 
             //Printer printer = helper.QueryFirstOrDefault<Printer>();
@@ -49,14 +52,14 @@ namespace ORMi.Sample
 
             //List<Processor> procesors = helper.Query<Processor>().ToList();
 
-            List<Device> devices = helper.Query<Device>().ToList()
-                .Where(p => (p.Name ?? "")
-                .Contains("Intel")).ToList();
+            //List<Device> devices = helper.Query<Device>().ToList()
+            //    .Where(p => (p.Name ?? "")
+            //    .Contains("Intel")).ToList();
 
-            foreach (Device d in devices)
-            {
-                Console.WriteLine(d.Name);
-            }
+            //foreach (Device d in devices)
+            //{
+            //    Console.WriteLine(d.Name);
+            //}
 
             //Person person = new Person
             //{

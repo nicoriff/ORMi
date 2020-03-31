@@ -7,15 +7,11 @@ using System.Threading.Tasks;
 namespace ORMi.Sample.Models
 {
     [WMIClass(Name = "Win32_Process", Namespace = "root\\CimV2")]
-    public class Process : WMIInstance
+    public class Process
     {
         public int Handle { get; set; }
         public string Name { get; set; }
         public int ProcessID { get; set; }
-
-        /// <summary>
-        /// Date the process begins executing.
-        /// </summary>
         public DateTime CreationDate { get; set; }
 
         public dynamic GetOwnerSid()
@@ -32,6 +28,12 @@ namespace ORMi.Sample.Models
         {
             return WMIMethod.ExecuteMethod<int>(this);
         }
+
+        public ProcessResult Create(string commandLine, string currentDirectory, string processStartupInformation)
+        {
+            ProcessResult res = WMIMethod.ExecuteStaticMethod<ProcessResult>(new { CommandLine = commandLine, CurrentDirectory = currentDirectory, ProcessStartupInformation = processStartupInformation});
+            return res;
+        }
     }
 
     public class ProcessOwner
@@ -39,5 +41,12 @@ namespace ORMi.Sample.Models
         public string Domain { get; set; }
         public int ReturnValue { get; set; }
         public string User { get; set; }
+    }
+
+
+    public class ProcessResult
+    {
+        public int ProcessId { get; set; }
+        public int ReturnValue { get; set; }
     }
 }

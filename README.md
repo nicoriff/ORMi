@@ -199,48 +199,67 @@ IMPORTANT: From version 2.0 all classes that have methods declared must inherit 
 
 **Static Methods:**
 
-Let's suppose we have a model class that represents an output on a smart card reader. The class will look like this:
+One example of static method is `Create()` on `Win32_Process` class. We are going to use it fo this example. Suppose we have the following model:
+
 ```C#
-    [WMIClass("Lnl_ReaderOutput1")]
-    public class Output : WMIInstance
+    [WMIClass(Name = "Win32_Process", Namespace = "root\\CimV2")]
+    public class Process
     {
-        public int PanelID { get; set; }
-        public int ReaderID { get; set; }
-        public string Hostname { get; set; }
+        public int Handle { get; set; }
         public string Name { get; set; }
+        public int ProcessID { get; set; }
+        public DateTime CreationDate { get; set; }
+
+        public dynamic GetOwnerSid()
+        {
+            return WMIMethod.ExecuteMethod(this);
+        }
+
+        public ProcessOwner GetOwner()
+        {
+            return WMIMethod.ExecuteMethod<ProcessOwner>(this);
+        }
+
+        public int AttachDebugger()
+        {
+            return WMIMethod.ExecuteMethod<int>(this);
+        }
+
+        public ProcessResult Create(string commandLine, string currentDirectory, string processStartupInformation)
+        {
+            ProcessResult res = WMIMethod.ExecuteStaticMethod<ProcessResult>(new { CommandLine = commandLine, CurrentDirectory = currentDirectory, ProcessStartupInformation = processStartupInformation});
+            return res;
+        }
+    }
+
+    public class ProcessOwner
+    {
+        public string Domain { get; set; }
+        public int ReturnValue { get; set; }
+        public string User { get; set; }
+    }
+
+
+    public class ProcessResult
+    {
+        public int ProcessId { get; set; }
+        public int ReturnValue { get; set; }
     }
 ```
+You can see that `Process` class has a couple of methods. Some of them are instance methods like `GetOwner` and others like `Create()` are static. As said earlier, *static* means that there is no need for an instance to be created to call the method. Notice that the implementation of `Create()` method is the following:
 
-We want to call a method that `Lnl_ReaderOutput1` has defined as `Activate` with no parameters in it. First, we are going to change a little bit the `WMIClass` attribute that the class has set. We are going to define the default namespace for the class:
 ```C#
-[WMIClass(Name = "Lnl_ReaderOutput1", Namespace = "root\\OnGuard")]
+	ProcessResult res = WMIMethod.ExecuteStaticMethod<ProcessResult>(new { CommandLine = commandLine, CurrentDirectory = currentDirectory, ProcessStartupInformation = processStartupInformation});
 ```
-Then, we have to add the method:
-```C#
-	public dynamic Activate()
-	{
-	    return WMIMethod.ExecuteMethod(this);
-	}
-```
-There is two things to note on the above code. The first one is that the method name **MUST** be the same than the method defined on the WMI class that we want to work with. The second one is that the method implementation will always be the same
+As you can see, you call the `ExecuteStaticMethod` method and specify which type of response you are awaiting by setting the \<T> parameter.
 
-What `WMIMethod.ExecuteMethod(this)` does is to call the static `WMIMethod` class and pass the actual instance so the WMI methods can be called. If the method require parameters being sent, so we can pass them using a anonymous object:
+So finally, you call the method simply like this:
 
 ```C#
-	public dynamic Activate(int panelID, int readerID)
-	{
-	    return WMIMethod.ExecuteMethod(this, new { PanelID = panelID, ReaderID = readerID });
-	}
-```
-So, finally, on your code you will have a much more cleaner implementation of method working:
+	WMIHelper helper = new WMIHelper("root\\CimV2");
 
-```C#
-	List<Output> outputList = helper.Query<Output>().ToList();
-
-	foreach (Output o in outputList)
-	{
-	    dynamic d = o.Activate(1, 5);
-	}
+	Process p = new Process();
+	p.Create("C:/Windows/notepad.exe", null, null);
 ```
 
 **Instance Methods:**
