@@ -5,7 +5,7 @@
     <Product>ORMi</Product>
     <Description>A Light-ORM for accesing WMI</Description>
     <Copyright>Copyright 2018</Copyright>
-    <Version>1.5</Version>
+    <Version>2.5.6.0</Version>
     <Authors>nicoriff</Authors>
     <PackageIconUrl>https://www.shareicon.net/data/128x128/2017/02/07/878478_key_512x512.png</PackageIconUrl>
     <PackageId>ORMi</PackageId>
