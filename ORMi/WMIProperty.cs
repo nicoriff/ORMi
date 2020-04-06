@@ -58,6 +58,11 @@ namespace ORMi
 
     }
 
+    public class WMISearchKey : Attribute
+    {
+        
+    }
+
     public class WMISearchKeyException : Exception
     {
         public WMISearchKeyException()

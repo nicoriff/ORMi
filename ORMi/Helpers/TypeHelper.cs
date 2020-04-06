@@ -236,9 +236,9 @@ namespace ORMi.Helpers
             return genericInstance;
         }
 
-        public static WMISearchKey GetSearchKey(object p)
+        public static SearchKey GetSearchKey(object p)
         {
-            WMISearchKey res = null;
+            SearchKey res = null;
 
             foreach (PropertyInfo propertyInfo in p.GetType().GetProperties())
             {
@@ -252,7 +252,7 @@ namespace ORMi.Helpers
                     {
                         if (propAtt.SearchKey)
                         {
-                            res = new WMISearchKey
+                            res = new SearchKey
                             {
                                 Name = propAtt.Name,
                                 Value = propertyInfo.GetValue(p)
@@ -267,9 +267,9 @@ namespace ORMi.Helpers
             return res;
         }
 
-        public static List<WMISearchKey> GetSearchKeys(object p)
+        public static List<SearchKey> GetSearchKeys(object p)
         {
-            List<WMISearchKey> res = new List<WMISearchKey>();
+            List<SearchKey> res = new List<SearchKey>();
 
             foreach (PropertyInfo propertyInfo in p.GetType().GetProperties())
             {
@@ -277,17 +277,43 @@ namespace ORMi.Helpers
 
                 if (ignoreProp == null)
                 {
-                    WMIProperty propAtt = propertyInfo.GetCustomAttribute<WMIProperty>();
+                    WMISearchKey searchAttribute = propertyInfo.GetCustomAttribute<WMISearchKey>();
 
-                    if (propAtt != null)
+                    if (searchAttribute != null)
                     {
-                        if (propAtt.SearchKey)
+                        WMIProperty propAtt = propertyInfo.GetCustomAttribute<WMIProperty>();
+
+                        if (propAtt != null)
                         {
-                            res.Add(new WMISearchKey
+                            res.Add(new SearchKey
                             {
                                 Name = propAtt.Name,
                                 Value = propertyInfo.GetValue(p)
                             });
+                        }
+                        else
+                        {
+                            res.Add(new SearchKey
+                            {
+                                Name = propertyInfo.Name,
+                                Value = propertyInfo.GetValue(p)
+                            });
+                        }
+                    }
+                    else
+                    {
+                        WMIProperty propAtt = propertyInfo.GetCustomAttribute<WMIProperty>();
+
+                        if (propAtt != null)
+                        {
+                            if (propAtt.SearchKey)
+                            {
+                                res.Add(new SearchKey
+                                {
+                                    Name = propAtt.Name,
+                                    Value = propertyInfo.GetValue(p)
+                                });
+                            }
                         }
                     }
                 }
@@ -323,7 +349,7 @@ namespace ORMi.Helpers
         }
     }
 
-    public class WMISearchKey
+    public class SearchKey
     {
         public string Name { get; set; }
         public object Value { get; set; }

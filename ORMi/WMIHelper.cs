@@ -115,7 +115,7 @@ namespace ORMi
 
                     string query = String.Format("SELECT * FROM {0}", TypeHelper.GetClassName(obj));
 
-                    List<WMISearchKey> keys = TypeHelper.GetSearchKeys(obj);
+                    List<SearchKey> keys = TypeHelper.GetSearchKeys(obj);
 
                     if (keys.Count > 0)
                     {
@@ -284,7 +284,7 @@ namespace ORMi
 
                     string query = String.Format("SELECT * FROM {0}", className);
 
-                    List<WMISearchKey> keys = TypeHelper.GetSearchKeys(obj);
+                    List<SearchKey> keys = TypeHelper.GetSearchKeys(obj);
 
                     if (keys.Count > 0)
                     {
