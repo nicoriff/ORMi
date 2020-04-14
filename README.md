@@ -3,6 +3,7 @@
 ORMi is a quite simple Light-ORM to work with WMI (Windows Management Instrumentation). It handles WMI CRUD operations in a very easy way. ORMi does automatic mapping to model clases so you can easily work with WMI classes without having to worry about writing complex queries and handling WMI connections.
 
 ## Getting Started
+![Nuget](https://img.shields.io/nuget/v/ORMi) ![Nuget](https://img.shields.io/nuget/dt/ORMi) ![GitHub release (latest by date)](https://img.shields.io/github/v/release/nicoriff/ORMi)
 
 ORMi is available via [NuGet](https://www.nuget.org/packages/ORMi/). Also, you can always download the latest release on https://github.com/nicoriff/ORMi/releases/.
 
@@ -58,12 +59,12 @@ This can also be done in async fashion:
 If you don't want to define your model classes the you can also get the result in a `List<dynamic>`
 
 ```C#
-	var devices = helper.Query("SELECT * FROM Win32_PnPEntity");
+    var devices = helper.Query("SELECT * FROM Win32_PnPEntity");
 ```
 You can also search for single instances:
 
 ```C#
-	Printer printer = helper.QueryFirstOrDefault<Printer>();
+     Printer printer = helper.QueryFirstOrDefault<Printer>();
 ```
 
 ## Create, Update and Delete:
@@ -249,7 +250,7 @@ One example of static method is `Create()` on `Win32_Process` class. We are goin
 You can see that `Process` class has a couple of methods. Some of them are instance methods like `GetOwner` and others like `Create()` are static. As said earlier, *static* means that there is no need for an instance to be created to call the method. Notice that the implementation of `Create()` method is the following:
 
 ```C#
-	ProcessResult res = WMIMethod.ExecuteStaticMethod<ProcessResult>(new { CommandLine = commandLine, CurrentDirectory = currentDirectory, ProcessStartupInformation = processStartupInformation});
+    ProcessResult res = WMIMethod.ExecuteStaticMethod<ProcessResult>(new { CommandLine = commandLine, CurrentDirectory = currentDirectory, ProcessStartupInformation = processStartupInformation});
 ```
 As you can see, you call the `ExecuteStaticMethod` method and specify which type of response you are awaiting by setting the \<T> parameter.
 
@@ -297,9 +298,9 @@ Then finally we'll use it this way:
 ```
 The above code will rename all printers to "Newly renamed printer" (be careful! :D)
 
-ORMi can also return and object containing the method execution result. For example let´s take `Win32_Process` class:
+ORMi can also return and object containing the method execution result. For example letÂ´s take `Win32_Process` class:
 
-We´ll define it as the following:
+WeÂ´ll define it as the following:
 
 ```C#
     [WMIClass("Win32_Process")]
@@ -326,7 +327,7 @@ We´ll define it as the following:
     }
 ```
 
-Note that `GetOwner()` implementation specifies a `ProcesOwner` type.   If you check WMI docs on `Win32_Processor` class for `GetOwner` method, you´ll see the following definition:
+Note that `GetOwner()` implementation specifies a `ProcesOwner` type.   If you check WMI docs on `Win32_Processor` class for `GetOwner` method, youÂ´ll see the following definition:
 
     uint32 GetOwner(
       [out] string User,
