@@ -4,12 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Management;
 using System.Reflection;
+using System.Security.Permissions;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace ORMi
 {
-    public class WMIWatcher
+    public class WMIWatcher : IDisposable
     {
         ManagementEventWatcher watcher;
         private string _scope;
@@ -85,6 +86,41 @@ namespace ORMi
 
                 WMIEventArrived(this, new WMIEventArgs { Object = d });
             }
+        }
+
+        /// <summary>
+        /// Starts the current WMI Event watcher
+        /// </summary>
+        public void StartWatcher()
+        {
+            if (watcher != null)
+            {
+                watcher.Start();
+            }
+            else
+            {
+                throw new NullReferenceException("The WMI Watcher is not initialized");
+            }
+        }
+
+        /// <summary>
+        /// Stops the current WMI Event watcher
+        /// </summary>
+        public void StopWatcher()
+        {
+            if (watcher != null)
+            {
+                watcher.Stop();
+            }
+            else
+            {
+                throw new NullReferenceException("The WMI Watcher is not initialized");
+            }
+        }
+
+        public void Dispose()
+        {
+            ((IDisposable)watcher).Dispose();
         }
     }
 
