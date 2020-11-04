@@ -25,12 +25,13 @@ namespace ORMi
         /// </summary>
         /// <param name="scope">Desired Scope</param>
         /// <param name="query">Query to be watch</param>
-        public WMIWatcher(string scope, string query)
+        /// <param name="options">Connection options. If null, default options are used</param>
+        public WMIWatcher(string scope, string query, ConnectionOptions options = null)
         {
             _scope = scope;
             _query = query;
 
-            CreateWatcher();
+            CreateWatcher(options);
         }
 
         /// <summary>
@@ -38,13 +39,14 @@ namespace ORMi
         /// </summary>
         /// <param name="scope">Desired Scope</param>
         /// <param name="type">Type of object that will initiate the watch</param>
-        public WMIWatcher(string scope, Type type)
+        /// <param name="options">Connection options. If null, default options are used</param>
+        public WMIWatcher(string scope, Type type, ConnectionOptions options = null)
         {
             _scope = scope;
             _query = String.Format("SELECT * FROM {0}", TypeHelper.GetClassName(type));
             _type = type;
 
-            CreateWatcher();
+            CreateWatcher(options);
         }
 
         /// <summary>
@@ -53,21 +55,28 @@ namespace ORMi
         /// <param name="scope">Desired Scope</param>
         /// <param name="query">Query to be watch</param>
         /// <param name="type">Type of result</param>
-        public WMIWatcher(string scope, string query, Type type)
+        /// <param name="options">Connection options. If null, default options are used</param>
+        public WMIWatcher(string scope, string query, Type type, ConnectionOptions options = null)
         {
             _scope = scope;
             _query = query;
             _type = type;
 
-            CreateWatcher();
+            CreateWatcher(options);
         }
 
         /// <summary>
         /// Create a WMI Event Watcher
         /// </summary>
-        private void CreateWatcher()
+        private void CreateWatcher(ConnectionOptions options = null)
         {
             watcher = new ManagementEventWatcher(_scope, _query);
+
+            if (options != null)
+            {
+                watcher.Scope.Options = options;
+            }
+
             watcher.EventArrived += Watcher_EventArrived;
             watcher.Start();
         }
