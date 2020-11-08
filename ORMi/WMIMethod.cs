@@ -23,7 +23,8 @@ namespace ORMi
         /// <returns></returns>
         public static dynamic ExecuteMethod(object obj)
         {
-            WindowsIdentity windowsIdentity = WindowsIdentity.GetCurrent();
+            using (WindowsIdentity windowsIdentity = WindowsIdentity.GetCurrent())
+            {
 
 #if NET45
             WindowsImpersonationContext impersonatedUser = windowsIdentity.Impersonate();
@@ -31,17 +32,21 @@ namespace ORMi
 #if NETSTANDARD20
             return WindowsIdentity.RunImpersonated(windowsIdentity.AccessToken, () =>
 #endif
-            {
-                var mth = new StackTrace().GetFrame(1).GetMethod();
-                string methodName = mth.Name;
+                {
+                    var mth = new StackTrace().GetFrame(1).GetMethod();
+                    string methodName = mth.Name;
 
-                ManagementClass genericClass = new ManagementClass(TypeHelper.GetNamespace(obj), TypeHelper.GetClassName(obj), null);
-
-                ManagementObject instance = TypeHelper.GetManagementObject(genericClass, obj);
-
-                ManagementBaseObject result = instance.InvokeMethod(methodName, null, null);
-
-                return result == null ? null : TypeHelper.LoadDynamicObject(result);
+                    using (ManagementClass genericClass = new ManagementClass(TypeHelper.GetNamespace(obj), TypeHelper.GetClassName(obj), null))
+                    {
+                        using (ManagementObject instance = TypeHelper.GetManagementObject(genericClass, obj))
+                        {
+                            using (ManagementBaseObject result = instance.InvokeMethod(methodName, null, null))
+                            {
+                                return result == null ? null : TypeHelper.LoadDynamicObject(result);
+                            }
+                        }
+                    }
+                }
             }
 #if NETSTANDARD20
                 );
@@ -56,7 +61,8 @@ namespace ORMi
         /// <returns></returns>
         public static T ExecuteMethod<T>(object obj)
         {
-            WindowsIdentity windowsIdentity = WindowsIdentity.GetCurrent();
+            using (WindowsIdentity windowsIdentity = WindowsIdentity.GetCurrent())
+            {
 
 #if NET45
             WindowsImpersonationContext impersonatedUser = windowsIdentity.Impersonate();
@@ -64,17 +70,21 @@ namespace ORMi
 #if NETSTANDARD20
             return WindowsIdentity.RunImpersonated(windowsIdentity.AccessToken, () =>
 #endif
-            {
-                var mth = new StackTrace().GetFrame(1).GetMethod();
-                string methodName = mth.Name;
+                {
+                    var mth = new StackTrace().GetFrame(1).GetMethod();
+                    string methodName = mth.Name;
 
-                ManagementClass genericClass = new ManagementClass(TypeHelper.GetNamespace(obj), TypeHelper.GetClassName(obj), null);
-
-                ManagementObject instance = TypeHelper.GetManagementObject(genericClass, obj);
-
-                ManagementBaseObject result = instance.InvokeMethod(methodName, null, null);
-
-                return (T)TypeHelper.LoadObject(result, typeof(T));
+                    using (ManagementClass genericClass = new ManagementClass(TypeHelper.GetNamespace(obj), TypeHelper.GetClassName(obj), null))
+                    {
+                        using (ManagementObject instance = TypeHelper.GetManagementObject(genericClass, obj))
+                        {
+                            using (ManagementBaseObject result = instance.InvokeMethod(methodName, null, null))
+                            {
+                                return (T)TypeHelper.LoadObject(result, typeof(T));
+                            }
+                        }
+                    }
+                }
             }
 #if NETSTANDARD20
                 );
@@ -89,7 +99,8 @@ namespace ORMi
         /// <returns></returns>
         public static dynamic ExecuteMethod(object obj, dynamic parameters)
         {
-            WindowsIdentity windowsIdentity = WindowsIdentity.GetCurrent();
+            using (WindowsIdentity windowsIdentity = WindowsIdentity.GetCurrent())
+            {
 
 #if NET45
             WindowsImpersonationContext impersonatedUser = windowsIdentity.Impersonate();
@@ -97,25 +108,30 @@ namespace ORMi
 #if NETSTANDARD20
             return WindowsIdentity.RunImpersonated(windowsIdentity.AccessToken, () =>
 #endif
-            {
-                var frame = new StackTrace().GetFrames().Skip(1).First(x => x.GetMethod().DeclaringType.Namespace != "System.Dynamic");
-
-                string methodName = frame.GetMethod().Name;
-
-                ManagementClass genericClass = new ManagementClass(TypeHelper.GetNamespace(obj), TypeHelper.GetClassName(obj), null);
-
-                ManagementObject instance = TypeHelper.GetManagementObject(genericClass, obj);
-
-                ManagementBaseObject inParams = genericClass.GetMethodParameters(methodName);
-
-                foreach (PropertyInfo p in parameters.GetType().GetProperties())
                 {
-                    inParams[p.Name] = p.GetValue(parameters);
+                    var frame = new StackTrace().GetFrames().Skip(1).First(x => x.GetMethod().DeclaringType.Namespace != "System.Dynamic");
+
+                    string methodName = frame.GetMethod().Name;
+
+                    using (ManagementClass genericClass = new ManagementClass(TypeHelper.GetNamespace(obj), TypeHelper.GetClassName(obj), null))
+                    {
+                        using (ManagementObject instance = TypeHelper.GetManagementObject(genericClass, obj))
+                        {
+                            using (ManagementBaseObject inParams = genericClass.GetMethodParameters(methodName))
+                            {
+                                foreach (PropertyInfo p in parameters.GetType().GetProperties())
+                                {
+                                    inParams[p.Name] = p.GetValue(parameters);
+                                }
+
+                                using (ManagementBaseObject result = instance.InvokeMethod(methodName, inParams, null))
+                                {
+                                    return result == null ? null : TypeHelper.LoadDynamicObject(result);
+                                }
+                            }
+                        }
+                    }
                 }
-
-                ManagementBaseObject result = instance.InvokeMethod(methodName, inParams, null);
-
-                return result == null ? null : TypeHelper.LoadDynamicObject(result);
             }
 #if NETSTANDARD20
                 );
@@ -131,7 +147,8 @@ namespace ORMi
         /// <returns></returns>
         public static T ExecuteMethod<T>(object obj, dynamic parameters)
         {
-            WindowsIdentity windowsIdentity = WindowsIdentity.GetCurrent();
+            using (WindowsIdentity windowsIdentity = WindowsIdentity.GetCurrent())
+            {
 
 #if NET45
             WindowsImpersonationContext impersonatedUser = windowsIdentity.Impersonate();
@@ -139,25 +156,30 @@ namespace ORMi
 #if NETSTANDARD20
             return WindowsIdentity.RunImpersonated(windowsIdentity.AccessToken, () =>
 #endif
-            {
-                var frame = new StackTrace().GetFrames().Skip(1).First(x => x.GetMethod().DeclaringType.Namespace != "System.Dynamic");
-
-                string methodName = frame.GetMethod().Name;
-
-                ManagementClass genericClass = new ManagementClass(TypeHelper.GetNamespace(obj), TypeHelper.GetClassName(obj), null);
-
-                ManagementObject instance = TypeHelper.GetManagementObject(genericClass, obj);
-
-                ManagementBaseObject inParams = genericClass.GetMethodParameters(methodName);
-
-                foreach (PropertyInfo p in parameters.GetType().GetProperties())
                 {
-                    inParams[p.Name] = p.GetValue(parameters);
+                    var frame = new StackTrace().GetFrames().Skip(1).First(x => x.GetMethod().DeclaringType.Namespace != "System.Dynamic");
+
+                    string methodName = frame.GetMethod().Name;
+
+                    using (ManagementClass genericClass = new ManagementClass(TypeHelper.GetNamespace(obj), TypeHelper.GetClassName(obj), null))
+                    {
+                        using (ManagementObject instance = TypeHelper.GetManagementObject(genericClass, obj))
+                        {
+                            using (ManagementBaseObject inParams = genericClass.GetMethodParameters(methodName))
+                            {
+                                foreach (PropertyInfo p in parameters.GetType().GetProperties())
+                                {
+                                    inParams[p.Name] = p.GetValue(parameters);
+                                }
+
+                                using (ManagementBaseObject result = instance.InvokeMethod(methodName, inParams, null))
+                                {
+                                    return (T)TypeHelper.LoadObject(result, typeof(T));
+                                }
+                            }
+                        }
+                    }
                 }
-
-                ManagementBaseObject result = instance.InvokeMethod(methodName, inParams, null);
-
-                return (T)TypeHelper.LoadObject(result, typeof(T));
             }
 #if NETSTANDARD20
                 );
@@ -175,11 +197,13 @@ namespace ORMi
 
             Type t = mth.ReflectedType;
 
-            ManagementClass cls = new ManagementClass(TypeHelper.GetNamespace(t), TypeHelper.GetClassName(t), null);
-
-            ManagementBaseObject result = cls.InvokeMethod(methodName, null, null);
-
-            return result == null ? null : TypeHelper.LoadDynamicObject(result);
+            using (ManagementClass cls = new ManagementClass(TypeHelper.GetNamespace(t), TypeHelper.GetClassName(t), null))
+            {
+                using (ManagementBaseObject result = cls.InvokeMethod(methodName, null, null))
+                {
+                    return result == null ? null : TypeHelper.LoadDynamicObject(result);
+                }
+            }
         }
 
         /// <summary>
@@ -194,11 +218,13 @@ namespace ORMi
 
             Type t = mth.ReflectedType;
 
-            ManagementClass cls = new ManagementClass(TypeHelper.GetNamespace(t), TypeHelper.GetClassName(t), null);
-
-            ManagementBaseObject result = cls.InvokeMethod(methodName, null, null);
-
-            return (T)TypeHelper.LoadObject(result, typeof(T));
+            using (ManagementClass cls = new ManagementClass(TypeHelper.GetNamespace(t), TypeHelper.GetClassName(t), null))
+            {
+                using (ManagementBaseObject result = cls.InvokeMethod(methodName, null, null))
+                {
+                    return (T)TypeHelper.LoadObject(result, typeof(T));
+                }
+            }
         }
 
         /// <summary>
@@ -214,18 +240,21 @@ namespace ORMi
 
             Type t = frame.GetMethod().ReflectedType;
 
-            ManagementClass cls = new ManagementClass(TypeHelper.GetNamespace(t), TypeHelper.GetClassName(t), null);
-
-            ManagementBaseObject inParams = cls.GetMethodParameters(methodName);
-
-            foreach (PropertyInfo p in parameters.GetType().GetProperties())
+            using (ManagementClass cls = new ManagementClass(TypeHelper.GetNamespace(t), TypeHelper.GetClassName(t), null))
             {
-                inParams[p.Name] = p.GetValue(parameters);
+                using (ManagementBaseObject inParams = cls.GetMethodParameters(methodName))
+                {
+                    foreach (PropertyInfo p in parameters.GetType().GetProperties())
+                    {
+                        inParams[p.Name] = p.GetValue(parameters);
+                    }
+
+                    using (ManagementBaseObject result = cls.InvokeMethod(methodName, inParams, null))
+                    {
+                        return result == null ? null : TypeHelper.LoadDynamicObject(result);
+                    }
+                }
             }
-
-            ManagementBaseObject result = cls.InvokeMethod(methodName, inParams, null);
-
-            return result == null ? null : TypeHelper.LoadDynamicObject(result);
         }
 
         /// <summary>
@@ -242,18 +271,21 @@ namespace ORMi
 
             Type t = frame.GetMethod().ReflectedType;
 
-            ManagementClass cls = new ManagementClass(TypeHelper.GetNamespace(t), TypeHelper.GetClassName(t), null);
-
-            ManagementBaseObject inParams = cls.GetMethodParameters(methodName);
-
-            foreach (PropertyInfo p in parameters.GetType().GetProperties())
+            using (ManagementClass cls = new ManagementClass(TypeHelper.GetNamespace(t), TypeHelper.GetClassName(t), null))
             {
-                inParams[p.Name] = p.GetValue(parameters);
+                using (ManagementBaseObject inParams = cls.GetMethodParameters(methodName))
+                {
+                    foreach (PropertyInfo p in parameters.GetType().GetProperties())
+                    {
+                        inParams[p.Name] = p.GetValue(parameters);
+                    }
+
+                    using (ManagementBaseObject result = cls.InvokeMethod(methodName, inParams, null))
+                    {
+                        return (T)TypeHelper.LoadObject(result, typeof(T));
+                    }
+                }
             }
-
-            ManagementBaseObject result = cls.InvokeMethod(methodName, inParams, null);
-
-            return (T)TypeHelper.LoadObject(result, typeof(T));
         }
     }
 }
