@@ -47,10 +47,10 @@ namespace ORMi
                         }
                     }
                 }
-            }
 #if NETSTANDARD20
                 );
 #endif
+            }
         }
 
         /// <summary>
@@ -85,10 +85,10 @@ namespace ORMi
                         }
                     }
                 }
-            }
 #if NETSTANDARD20
                 );
 #endif
+            }
         }
 
         /// <summary>
@@ -132,10 +132,10 @@ namespace ORMi
                         }
                     }
                 }
-            }
 #if NETSTANDARD20
                 );
 #endif
+            }
         }
 
         /// <summary>
@@ -180,10 +180,10 @@ namespace ORMi
                         }
                     }
                 }
-            }
 #if NETSTANDARD20
                 );
 #endif
+            }
         }
 
         /// <summary>

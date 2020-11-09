@@ -1,4 +1,5 @@
-﻿using ORMi.Sample.Models;
+﻿using ORMi.Interfaces;
+using ORMi.Sample.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

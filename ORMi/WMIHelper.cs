@@ -205,10 +205,10 @@ namespace ORMi
                             throw new WMISearchKeyException("There is no SearchKey specified for the object");
                         }
                     }
-                }
 #if NETSTANDARD20
                 );
 #endif
+                }
             }
             catch (Exception ex)
             {
@@ -282,10 +282,10 @@ namespace ORMi
                             }
                         }
                     }
-                }
 #if NETSTANDARD20
                 );
 #endif
+                }
             }
             catch (Exception ex)
             {
@@ -359,10 +359,10 @@ namespace ORMi
                             throw new WMISearchKeyException("There is no SearchKey specified for the object");
                         }
                     }
-                }
 #if NETSTANDARD20
                 );
 #endif
+                }
             }
             catch (Exception ex)
             {
@@ -410,10 +410,10 @@ namespace ORMi
                             }
                         }
                     }
-                }
 #if NETSTANDARD20
                 );
 #endif
+                }
             }
             catch (Exception ex)
             {
