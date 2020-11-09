@@ -11,7 +11,7 @@ namespace ORMi.Sample
     {
         static void Main(string[] args)
         {
-            WMIHelper helper = new WMIHelper("root\\CimV2");
+            IWMIHelper helper = new WMIHelper("root\\CimV2");
 
             Process p = new Process();
             p.Create("C:/Windows/notepad.exe", null, null);

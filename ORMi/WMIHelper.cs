@@ -1,4 +1,5 @@
 ﻿using ORMi.Helpers;
+using ORMi.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace ORMi
 {
-    public class WMIHelper
+    public class WMIHelper : IWMIHelper
     {
         public ManagementScope Scope { get;set; }
 
@@ -216,7 +217,7 @@ namespace ORMi
         }
 
         /// <summary>
-        /// Modifies an existing instance asynchonously.
+        /// Modifies an existing instance asynchronously.
         /// </summary>
         /// <param name="obj">Object to be updated. ORMi will search the property with the SearchKey attribute. That value is going to be used to make the update.</param>
         /// <returns></returns>
@@ -293,7 +294,7 @@ namespace ORMi
         }
 
         /// <summary>
-        /// Modifies an existing instance based on a custom query asynchonously.
+        /// Modifies an existing instance based on a custom query asynchronously.
         /// </summary>
         /// <param name="obj">Object to be updated</param>
         /// <param name="query">Query to be run. The resulting instances will be updated</param>
@@ -646,8 +647,85 @@ namespace ORMi
             return await Task.Run(() => QueryFirstOrDefault<T>(query));
         }
 
+        /// <summary>
+        /// Runs a WMI bulk insertion. If there are any errors on the bulk insert, it will throw an AggregateException at the end of the run. You might want to catch that exception.
+        /// </summary>
+        /// <param name="instances">List of objects containing all the instances to insert</param>
+        public void BulkInsert(List<object> instances)
+        {
+            List<Exception> exceptions = new List<Exception>();
 
-#endregion
+            foreach (object o in instances)
+            {
+                try
+                {
+                    AddInstance(o);
+                }
+                catch (Exception ex)
+                {
+                    exceptions.Add(ex);
+                }
+            }
+
+            if (exceptions.Any())
+            {
+                AggregateException aggregateException = new AggregateException(exceptions);
+
+                throw aggregateException;
+            }
+        }
+
+        /// <summary>
+        /// Runs an asynchronous WMI bulk insertion. If there are any errors on the bulk insert, it will throw an AggregateException at the end of the run. You might want to catch that exception.
+        /// </summary>
+        /// <param name="instances">List of objects containing all the instances to insert</param>
+        /// <returns></returns>
+        public async Task BulkInsertAsync(List<object> instances)
+        {
+            await Task.Run(() => BulkInsert(instances));
+        }
+
+        /// <summary>
+        /// Runs a WMI bulk update. If there are any errors on the bulk update, it will throw an AggregateException at the end of the run. You might want to catch that exception.
+        /// </summary>
+        /// <param name="instances">List of objects containing all the instances to update</param>
+        /// <returns></returns>
+        public void BulkUpdate(List<object> instances)
+        {
+            List<Exception> exceptions = new List<Exception>();
+
+            foreach (object o in instances)
+            {
+                try
+                {
+                    UpdateInstance(o);
+                }
+                catch (Exception ex)
+                {
+                    exceptions.Add(ex);
+                }
+            }
+
+            if (exceptions.Any())
+            {
+                AggregateException aggregateException = new AggregateException(exceptions);
+
+                throw aggregateException;
+            }
+        }
+
+        /// <summary>
+        /// Runs an asynchronous WMI bulk update. If there are any errors on the bulk update, it will throw an AggregateException at the end of the run. You might want to catch that exception.
+        /// </summary>
+        /// <param name="instances">List of objects containing all the instances to update</param>
+        /// <returns></returns>
+        public async Task BulkUpdateAsync(List<object> instances)
+        {
+            await Task.Run(() => BulkUpdate(instances));
+        }
+
+
+        #endregion
 
     }
 }
