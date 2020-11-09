@@ -20,10 +20,12 @@ namespace ORMi
         /// <param name="scope">WMI namespace</param>
         public WMIHelper(string scope)
         {
-            Scope = new ManagementScope(scope);
-            Scope.Options = new ConnectionOptions
+            Scope = new ManagementScope(scope)
             {
-                Impersonation = ImpersonationLevel.Impersonate
+                Options = new ConnectionOptions
+                {
+                    Impersonation = ImpersonationLevel.Impersonate
+                }
             };
         }
 
@@ -35,11 +37,13 @@ namespace ORMi
         /// <param name="auth">Athentication level</param>
         public WMIHelper(string scope, string hostname, AuthenticationLevel auth = AuthenticationLevel.Default)
         {
-            Scope = new ManagementScope(String.Format("\\\\{0}\\{1}", hostname, scope));
-            Scope.Options = new ConnectionOptions
+            Scope = new ManagementScope(String.Format("\\\\{0}\\{1}", hostname, scope))
             {
-                Impersonation = ImpersonationLevel.Impersonate,
-                Authentication = auth
+                Options = new ConnectionOptions
+                {
+                    Impersonation = ImpersonationLevel.Impersonate,
+                    Authentication = auth
+                }
             };
         }
 
@@ -53,12 +57,14 @@ namespace ORMi
         /// <param name="auth">Athentication level</param>
         public WMIHelper(string scope, string hostname, string domain, AuthenticationLevel auth = AuthenticationLevel.Default)
         {
-            Scope = new ManagementScope(String.Format("\\\\{0}\\{1}", hostname, scope));
-            Scope.Options = new ConnectionOptions
+            Scope = new ManagementScope(String.Format("\\\\{0}\\{1}", hostname, scope))
             {
-                Impersonation = ImpersonationLevel.Impersonate,
-                Authentication = auth,
-                Authority = $"ntlmdomain:{domain}"
+                Options = new ConnectionOptions
+                {
+                    Impersonation = ImpersonationLevel.Impersonate,
+                    Authentication = auth,
+                    Authority = $"ntlmdomain:{domain}"
+                }
             };
         }
 
@@ -72,13 +78,15 @@ namespace ORMi
         /// <param name="auth">Athentication level</param>
         public WMIHelper(string scope, string hostname, string username, string password, AuthenticationLevel auth = AuthenticationLevel.Default)
         {
-            Scope = new ManagementScope(String.Format("\\\\{0}\\{1}", hostname, scope));
-            Scope.Options = new ConnectionOptions
+            Scope = new ManagementScope(String.Format("\\\\{0}\\{1}", hostname, scope))
             {
-                Impersonation = ImpersonationLevel.Impersonate,
-                Authentication = auth,
-                Username = username,
-                Password = password
+                Options = new ConnectionOptions
+                {
+                    Impersonation = ImpersonationLevel.Impersonate,
+                    Authentication = auth,
+                    Username = username,
+                    Password = password
+                }
             };
         }
 
@@ -94,11 +102,13 @@ namespace ORMi
             {
                 Scope.Path.ClassName = TypeHelper.GetClassName(obj);
 
-                ManagementClass genericClass = new ManagementClass(Scope.Path);
-
-                ManagementObject genericInstance = TypeHelper.GetManagementObject(genericClass, obj);
-
-                genericInstance.Put();
+                using (ManagementClass genericClass = new ManagementClass(Scope.Path))
+                {
+                    using (ManagementObject genericInstance = TypeHelper.GetManagementObject(genericClass, obj))
+                    {
+                        genericInstance.Put();
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -124,7 +134,8 @@ namespace ORMi
         {
             try
             {
-                WindowsIdentity windowsIdentity = WindowsIdentity.GetCurrent();
+                using (WindowsIdentity windowsIdentity = WindowsIdentity.GetCurrent())
+                {
 
 #if NET45
                 WindowsImpersonationContext impersonatedUser = windowsIdentity.Impersonate();
@@ -132,63 +143,66 @@ namespace ORMi
 #if NETSTANDARD20
                 WindowsIdentity.RunImpersonated(windowsIdentity.AccessToken, () =>
 #endif
-                {
-                    string className = TypeHelper.GetClassName(obj);
-
-                    string query = String.Format("SELECT * FROM {0}", TypeHelper.GetClassName(obj));
-
-                    List<SearchKey> keys = TypeHelper.GetSearchKeys(obj);
-
-                    if (keys.Count > 0)
                     {
-                        for (int i = 0; i < keys.Count; i++)
+                        string className = TypeHelper.GetClassName(obj);
+
+                        string query = String.Format("SELECT * FROM {0}", TypeHelper.GetClassName(obj));
+
+                        List<SearchKey> keys = TypeHelper.GetSearchKeys(obj);
+
+                        if (keys.Count > 0)
                         {
-                            if (i == 0)
+                            for (int i = 0; i < keys.Count; i++)
                             {
-                                query = String.Format("{0} WHERE {1} = '{2}'", query, keys[i].Name, keys[i].Value);
-                            }
-                            else
-                            {
-                                query = String.Format("{0} AND {1} = '{2}'", query, keys[i].Name, keys[i].Value);
-                            }
-                        }
-
-                        ManagementObjectSearcher searcher;
-                        searcher = new ManagementObjectSearcher(Scope, new ObjectQuery(query));
-
-                        ManagementObjectCollection col = searcher.Get();
-
-                        foreach (ManagementObject m in searcher.Get())
-                        {
-                            foreach (PropertyInfo p in obj.GetType().GetProperties())
-                            {
-                                if (p.GetValue(obj) != null)
+                                if (i == 0)
                                 {
-                                    WMIIgnore ignoreProp = p.GetCustomAttribute<WMIIgnore>();
-                                    WMIIgnoreOnUpdate ignoreOnUpdateProp = p.GetCustomAttribute<WMIIgnoreOnUpdate>();
-
-                                    if (ignoreProp == null && ignoreOnUpdateProp == null)
-                                    {
-                                        WMIProperty propAtt = p.GetCustomAttribute<WMIProperty>();
-
-                                        if (propAtt != null)
-                                        {
-                                            m[propAtt.Name] = p.GetValue(obj).GetType() == typeof(DateTime) ? ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(p.GetValue(obj))) : p.GetValue(obj);
-                                        }
-                                        else
-                                        {
-                                            m[p.Name] = p.GetValue(obj).GetType() == typeof(DateTime) ? ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(p.GetValue(obj))) : p.GetValue(obj);
-                                        }
-                                    }
+                                    query = String.Format("{0} WHERE {1} = '{2}'", query, keys[i].Name, keys[i].Value);
+                                }
+                                else
+                                {
+                                    query = String.Format("{0} AND {1} = '{2}'", query, keys[i].Name, keys[i].Value);
                                 }
                             }
 
-                            m.Put();
+                            ManagementObjectSearcher searcher;
+                            using (searcher = new ManagementObjectSearcher(Scope, new ObjectQuery(query)))
+                            {
+                                using (ManagementObjectCollection col = searcher.Get())
+                                {
+                                    foreach (ManagementObject m in col)
+                                    {
+                                        foreach (PropertyInfo p in obj.GetType().GetProperties())
+                                        {
+                                            if (p.GetValue(obj) != null)
+                                            {
+                                                WMIIgnore ignoreProp = p.GetCustomAttribute<WMIIgnore>();
+                                                WMIIgnoreOnUpdate ignoreOnUpdateProp = p.GetCustomAttribute<WMIIgnoreOnUpdate>();
+
+                                                if (ignoreProp == null && ignoreOnUpdateProp == null)
+                                                {
+                                                    WMIProperty propAtt = p.GetCustomAttribute<WMIProperty>();
+
+                                                    if (propAtt != null)
+                                                    {
+                                                        m[propAtt.Name] = p.GetValue(obj).GetType() == typeof(DateTime) ? ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(p.GetValue(obj))) : p.GetValue(obj);
+                                                    }
+                                                    else
+                                                    {
+                                                        m[p.Name] = p.GetValue(obj).GetType() == typeof(DateTime) ? ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(p.GetValue(obj))) : p.GetValue(obj);
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        m.Put();
+                                    }
+                                }
+                            }
                         }
-                    }
-                    else
-                    {
-                        throw new WMISearchKeyException("There is no SearchKey specified for the object");
+                        else
+                        {
+                            throw new WMISearchKeyException("There is no SearchKey specified for the object");
+                        }
                     }
                 }
 #if NETSTANDARD20
@@ -220,7 +234,8 @@ namespace ORMi
         {
             try
             {
-                WindowsIdentity windowsIdentity = WindowsIdentity.GetCurrent();
+                using (WindowsIdentity windowsIdentity = WindowsIdentity.GetCurrent())
+                {
 
 #if NET45
                 WindowsImpersonationContext impersonatedUser = windowsIdentity.Impersonate();
@@ -228,40 +243,43 @@ namespace ORMi
 #if NETSTANDARD20
                 WindowsIdentity.RunImpersonated(windowsIdentity.AccessToken, () =>
 #endif
-                {
-                    string className = TypeHelper.GetClassName(obj);
-
-                    ManagementObjectSearcher searcher;
-                    searcher = new ManagementObjectSearcher(Scope, new ObjectQuery(query));
-
-                    ManagementObjectCollection col = searcher.Get();
-
-                    foreach (ManagementObject m in searcher.Get())
                     {
-                        foreach (PropertyInfo p in obj.GetType().GetProperties())
+                        string className = TypeHelper.GetClassName(obj);
+
+                        ManagementObjectSearcher searcher;
+                        using (searcher = new ManagementObjectSearcher(Scope, new ObjectQuery(query)))
                         {
-                            WMIIgnore ignoreProp = p.GetCustomAttribute<WMIIgnore>();
-                            WMIIgnoreOnUpdate ignoreOnUpdateProp = p.GetCustomAttribute<WMIIgnoreOnUpdate>();
-
-                            if (ignoreProp == null && ignoreOnUpdateProp == null)
+                            using (ManagementObjectCollection col = searcher.Get())
                             {
-                                if (p.GetValue(obj) != null)
+                                foreach (ManagementObject m in col)
                                 {
-                                    WMIProperty propAtt = p.GetCustomAttribute<WMIProperty>();
+                                    foreach (PropertyInfo p in obj.GetType().GetProperties())
+                                    {
+                                        WMIIgnore ignoreProp = p.GetCustomAttribute<WMIIgnore>();
+                                        WMIIgnoreOnUpdate ignoreOnUpdateProp = p.GetCustomAttribute<WMIIgnoreOnUpdate>();
 
-                                    if (propAtt != null)
-                                    {
-                                        m[propAtt.Name] = p.GetValue(obj).GetType() == typeof(DateTime) ? ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(p.GetValue(obj))) : p.GetValue(obj);
+                                        if (ignoreProp == null && ignoreOnUpdateProp == null)
+                                        {
+                                            if (p.GetValue(obj) != null)
+                                            {
+                                                WMIProperty propAtt = p.GetCustomAttribute<WMIProperty>();
+
+                                                if (propAtt != null)
+                                                {
+                                                    m[propAtt.Name] = p.GetValue(obj).GetType() == typeof(DateTime) ? ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(p.GetValue(obj))) : p.GetValue(obj);
+                                                }
+                                                else
+                                                {
+                                                    m[p.Name] = p.GetValue(obj).GetType() == typeof(DateTime) ? ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(p.GetValue(obj))) : p.GetValue(obj);
+                                                }
+                                            }
+                                        }
                                     }
-                                    else
-                                    {
-                                        m[p.Name] = p.GetValue(obj).GetType() == typeof(DateTime) ? ManagementDateTimeConverter.ToDmtfDateTime(Convert.ToDateTime(p.GetValue(obj))) : p.GetValue(obj);
-                                    }
+
+                                    m.Put();
                                 }
                             }
                         }
-
-                        m.Put();
                     }
                 }
 #if NETSTANDARD20
@@ -293,7 +311,8 @@ namespace ORMi
         {
             try
             {
-                WindowsIdentity windowsIdentity = WindowsIdentity.GetCurrent();
+                using (WindowsIdentity windowsIdentity = WindowsIdentity.GetCurrent())
+                {
 
 #if NET45
                 WindowsImpersonationContext impersonatedUser = windowsIdentity.Impersonate();
@@ -301,38 +320,43 @@ namespace ORMi
 #if NETSTANDARD20
                 WindowsIdentity.RunImpersonated(windowsIdentity.AccessToken, () =>
 #endif
-                {
-                    string className = TypeHelper.GetClassName(obj);
-
-                    string query = String.Format("SELECT * FROM {0}", className);
-
-                    List<SearchKey> keys = TypeHelper.GetSearchKeys(obj);
-
-                    if (keys.Count > 0)
                     {
-                        for (int i = 0; i < keys.Count; i++)
+                        string className = TypeHelper.GetClassName(obj);
+
+                        string query = String.Format("SELECT * FROM {0}", className);
+
+                        List<SearchKey> keys = TypeHelper.GetSearchKeys(obj);
+
+                        if (keys.Count > 0)
                         {
-                            if (i == 0)
+                            for (int i = 0; i < keys.Count; i++)
                             {
-                                query = String.Format("{0} WHERE {1} = '{2}'", query, keys[i].Name, keys[i].Value);
+                                if (i == 0)
+                                {
+                                    query = String.Format("{0} WHERE {1} = '{2}'", query, keys[i].Name, keys[i].Value);
+                                }
+                                else
+                                {
+                                    query = String.Format("{0} AND {1} = '{2}'", query, keys[i].Name, keys[i].Value);
+                                }
                             }
-                            else
+
+                            ManagementObjectSearcher searcher;
+                            using (searcher = new ManagementObjectSearcher(Scope, new ObjectQuery(query)))
                             {
-                                query = String.Format("{0} AND {1} = '{2}'", query, keys[i].Name, keys[i].Value);
+                                using (ManagementObjectCollection col = searcher.Get())
+                                {
+                                    foreach (ManagementObject m in col)
+                                    {
+                                        m.Delete();
+                                    }
+                                }
                             }
                         }
-
-                        ManagementObjectSearcher searcher;
-                        searcher = new ManagementObjectSearcher(Scope, new ObjectQuery(query));
-
-                        foreach (ManagementObject m in searcher.Get())
+                        else
                         {
-                            m.Delete();
+                            throw new WMISearchKeyException("There is no SearchKey specified for the object");
                         }
-                    }
-                    else
-                    {
-                        throw new WMISearchKeyException("There is no SearchKey specified for the object");
                     }
                 }
 #if NETSTANDARD20
@@ -363,7 +387,8 @@ namespace ORMi
         {
             try
             {
-                WindowsIdentity windowsIdentity = WindowsIdentity.GetCurrent();
+                using (WindowsIdentity windowsIdentity = WindowsIdentity.GetCurrent())
+                {
 
 #if NET45
                 WindowsImpersonationContext impersonatedUser = windowsIdentity.Impersonate();
@@ -371,13 +396,18 @@ namespace ORMi
 #if NETSTANDARD20
                 WindowsIdentity.RunImpersonated(windowsIdentity.AccessToken, () =>
 #endif
-                {
-                    ManagementObjectSearcher searcher;
-                    searcher = new ManagementObjectSearcher(Scope, new ObjectQuery(query));
-
-                    foreach (ManagementObject m in searcher.Get())
                     {
-                        m.Delete();
+                        ManagementObjectSearcher searcher;
+                        using (searcher = new ManagementObjectSearcher(Scope, new ObjectQuery(query)))
+                        {
+                            using (ManagementObjectCollection col = searcher.Get())
+                            {
+                                foreach (ManagementObject m in col)
+                                {
+                                    m.Delete();
+                                }
+                            }
+                        }
                     }
                 }
 #if NETSTANDARD20

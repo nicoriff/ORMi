@@ -10,12 +10,12 @@ using System.Threading.Tasks;
 
 namespace ORMi
 {
-    public class WMIWatcher : IDisposable
+    public sealed class WMIWatcher : IDisposable
     {
         ManagementEventWatcher watcher;
-        private string _scope;
-        private string _query;
-        private Type _type;
+        private readonly string _scope;
+        private readonly string _query;
+        private readonly Type _type;
 
         public delegate void WMIEventHandler(object sender, WMIEventArgs e);
         public event WMIEventHandler WMIEventArrived;
@@ -70,6 +70,7 @@ namespace ORMi
         /// </summary>
         private void CreateWatcher(ConnectionOptions options = null)
         {
+            watcher?.Dispose();
             watcher = new ManagementEventWatcher(_scope, _query);
 
             if (options != null)
