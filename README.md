@@ -34,7 +34,11 @@ Then, we'll define the following class:
 ORMi has some custom attributes to map the model clases to WMI classes. WMI classes usually have tricky or non conventional names that you will for sure not want to use on your class. For solving that problem ORMi just maps the class property name to the WMI property name. If you do not want to use the WMI property name then you can just specify the ```WMIProperty``` attribute and match it to the name of the WMI property. The same run for class names. In that case you can make use of ```WMIClass``` attribute.
 Note that the class inherits from ``WMIInstance`` class. This is an optional practice from version 2.0. Even if you can not use it, it is recommended as it will be strictly neccesary if you work with WMI methods. If you don't use methods, just don't add the inheritance.
 
-Then, the first thing you got to do is create the ```WMIHelper``` that is the class that you'll use to interact with WMI. You can either create the instance for local use or to use with a remote client. In that case you have to specify credentials or make sure that the user have the corresponding privileges:
+The first thing you got to do is create the ```WMIHelper``` that is the class that you'll use to interact with WMI. You can either create the instance for local use or to connect to a remote client. In that case you have to specify credentials or make sure that the user have the corresponding privileges. From version 3.0 there is actually two ways you can create an instance of ```WMIHelper```:
+
+#### 1) Manually Create
+
+You just have to create a ```WMIHelper``` instance and you are all set to go.
 
 ```C#
     WMIHelper helper = new WMIHelper("root\\CimV2");
@@ -45,7 +49,33 @@ Or specifiying client machine and credentials:
     WMIHelper helper = new WMIHelper("root\\CimV2", "W2012SRV-WRK", "Administrator", "Password01");
 ```
 
-Then you simple query for the data:
+#### 2) Dependecy Injection
+
+From version 3.0 you can make use of Microsoft DI implementation to inject ```WMIHelper``` instance to all the classes that need to use it:
+
+On ```Program.cs``` declare the ```IWMIHelper``` implementation:
+
+```C#
+    .ConfigureServices((hostContext, services) =>
+    {
+        services.AddSingleton<IWMIHelper>(new WMIHelper("root\\cimv2"));
+        services.AddHostedService<Worker>();
+    });
+```
+And then you can make use of dependency injection wherever you need it:
+
+```C#
+    private readonly IWMIHelper _helper;
+
+    public WMIService(IWMIHelper helper)
+    {
+        _helper = helper;
+    }
+```
+
+#### Usage
+
+Then you simply query for the data:
 
 ```C#
     List<Processor> processors = helper.Query<Processor>().ToList();
