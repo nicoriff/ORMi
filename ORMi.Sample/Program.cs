@@ -12,10 +12,10 @@ namespace ORMi.Sample
     {
         static void Main(string[] args)
         {
-            IWMIHelper helper = new WMIHelper("root\\CimV2");
+            //IWMIHelper helper = new WMIHelper("root\\CimV2");
 
-            Process p = new Process();
-            p.Create("C:/Windows/notepad.exe", null, null);
+            //Process p = new Process();
+            //p.Create("C:/Windows/notepad.exe", null, null);
 
             //List<NetworkAdapterConfiguration> interfaces = helper.Query<NetworkAdapterConfiguration>().ToList();
 
@@ -79,8 +79,8 @@ namespace ORMi.Sample
             //List<Person> queryPerson = helper.Query<Person>("SELECT * FROM Lnl_Cardholder WHERE LASTNAME = 'Lopez'").ToList();
 
             //WMIWatcher watcher = new WMIWatcher("root\\CimV2", "SELECT * FROM Win32_ProcessStartTrace", typeof(Process));
-            //WMIWatcher watcher = new WMIWatcher("root\\CimV2", "SELECT * FROM Win32_ProcessStartTrace");
-            //watcher.WMIEventArrived += Watcher_WMIEventArrived;
+            WMIWatcher watcher = new WMIWatcher("root\\CimV2", "SELECT * FROM Win32_ProcessStartTrace");
+            watcher.WMIEventArrived += Watcher_WMIEventArrived;
 
             Console.ReadLine();
         }
@@ -89,6 +89,7 @@ namespace ORMi.Sample
         {
             //Process process = (Process)e.Object;
 
+            
             dynamic process = e.Object;
 
             Console.WriteLine("New Process: {0} (Pid: {1})", process.ProcessName, process.ProcessID.ToString());

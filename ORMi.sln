@@ -1,18 +1,20 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27703.2000
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30709.132
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ORMi", "ORMi\ORMi.csproj", "{458EAFAF-7557-45E7-81C7-73C34834CCF8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ORMi", "ORMi\ORMi.csproj", "{458EAFAF-7557-45E7-81C7-73C34834CCF8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{244C8151-A276-408B-BA7F-3A3672649234}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ORMi.Sample", "ORMi.Sample\ORMi.Sample.csproj", "{3F99A314-D156-469A-9651-D365A478FA4B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ORMi.Sample", "ORMi.Sample\ORMi.Sample.csproj", "{3F99A314-D156-469A-9651-D365A478FA4B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ORMi.Tests", "ORMi.Tests\ORMi.Tests.csproj", "{3637DD0D-E46C-4B0D-8382-40B71A351B24}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ORMi.Tests", "ORMi.Tests\ORMi.Tests.csproj", "{3637DD0D-E46C-4B0D-8382-40B71A351B24}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ORMi.Sample.Worker", "ORMi.Sample.Worker\ORMi.Sample.Worker.csproj", "{4AAE0870-1E3A-4335-9A49-1F7D9900F389}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,6 +34,10 @@ Global
 		{3637DD0D-E46C-4B0D-8382-40B71A351B24}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3637DD0D-E46C-4B0D-8382-40B71A351B24}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3637DD0D-E46C-4B0D-8382-40B71A351B24}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4AAE0870-1E3A-4335-9A49-1F7D9900F389}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4AAE0870-1E3A-4335-9A49-1F7D9900F389}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4AAE0870-1E3A-4335-9A49-1F7D9900F389}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4AAE0870-1E3A-4335-9A49-1F7D9900F389}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

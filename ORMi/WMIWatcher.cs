@@ -1,4 +1,5 @@
 ﻿using ORMi.Helpers;
+using ORMi.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,15 +11,23 @@ using System.Threading.Tasks;
 
 namespace ORMi
 {
-    public sealed class WMIWatcher : IDisposable
+    public sealed class WMIWatcher : IWMIWatcher, IDisposable
     {
         ManagementEventWatcher watcher;
-        private readonly string _scope;
-        private readonly string _query;
-        private readonly Type _type;
+        private string _scope;
+        private string _query;
+        private Type _type;
 
         public delegate void WMIEventHandler(object sender, WMIEventArgs e);
         public event WMIEventHandler WMIEventArrived;
+
+        /// <summary>
+        /// Creates empty WMIWatcher. BEWARE that if you use this constructor you will hace to manually call Initialize method. Otherwise nothing will work.
+        /// </summary>
+        public WMIWatcher()
+        {
+            
+        }
 
         /// <summary>
         /// Creeates a WMI Watcher for the specified query. It returns a dynamic object.
@@ -28,10 +37,7 @@ namespace ORMi
         /// <param name="options">Connection options. If null, default options are used</param>
         public WMIWatcher(string scope, string query, ConnectionOptions options = null)
         {
-            _scope = scope;
-            _query = query;
-
-            CreateWatcher(options);
+            Initialize(scope, query, options: options);
         }
 
         /// <summary>
@@ -42,11 +48,7 @@ namespace ORMi
         /// <param name="options">Connection options. If null, default options are used</param>
         public WMIWatcher(string scope, Type type, ConnectionOptions options = null)
         {
-            _scope = scope;
-            _query = String.Format("SELECT * FROM {0}", TypeHelper.GetClassName(type));
-            _type = type;
-
-            CreateWatcher(options);
+            Initialize(scope, String.Format("SELECT * FROM {0}", TypeHelper.GetClassName(type), type, options));
         }
 
         /// <summary>
@@ -58,8 +60,21 @@ namespace ORMi
         /// <param name="options">Connection options. If null, default options are used</param>
         public WMIWatcher(string scope, string query, Type type, ConnectionOptions options = null)
         {
+            Initialize(scope, query, type, options);
+        }
+
+        /// <summary>
+        /// Initializes the WMIWatcher with the desired parameters.
+        /// </summary>
+        /// <param name="scope">Desired Scope</param>
+        /// <param name="query">Query to be watch</param>
+        /// <param name="type">Type of result</param>
+        /// <param name="options">Connection options. If null, default options are used</param>
+        public void Initialize(string scope, string query, Type type = null, ConnectionOptions options = null)
+        {
             _scope = scope;
             _query = query;
+
             _type = type;
 
             CreateWatcher(options);
@@ -128,6 +143,9 @@ namespace ORMi
             }
         }
 
+        /// <summary>
+        /// Disposes the WMIWatcher object.
+        /// </summary>
         public void Dispose()
         {
             ((IDisposable)watcher).Dispose();

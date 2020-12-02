@@ -56,58 +56,65 @@ namespace ORMi.Helpers
 
             if (ignoreProp == null)
             {
-                WMIProperty propAtt = p.GetCustomAttribute<WMIProperty>();
-
-                string propertyName = String.Empty;
-
-                if (propAtt != null)
+                try
                 {
-                    propertyName = propAtt.Name;
-                }
-                else
-                {
-                    propertyName = p.Name;
-                }
+                    WMIProperty propAtt = p.GetCustomAttribute<WMIProperty>();
 
-                var a = mo.Properties[propertyName].Value;
+                    string propertyName = String.Empty;
 
-                if (a == null)
-                {
-                    p.SetValue(o, null);
-                }
-                else if (p.PropertyType == typeof(DateTime) && a is string s)
-                {
-                    p.SetValue(o, ManagementDateTimeConverter.ToDateTime((string)a), null);
-                }
-                else if (a is ManagementBaseObject b)
-                {
-                    var classAtt = p.PropertyType.GetCustomAttribute<WMIClass>();
-
-                    string className = String.Empty;
-
-                    if (classAtt != null)
+                    if (propAtt != null)
                     {
-                        className = classAtt.Name;
+                        propertyName = propAtt.Name;
                     }
                     else
                     {
-                        className = p.PropertyType.Name;
+                        propertyName = p.Name;
                     }
 
-                    if (className == b.ClassPath.ClassName)
+                    var a = mo.Properties[propertyName].Value;
+
+                    if (a == null)
                     {
-                        p.SetValue(o, LoadObject(b, p.PropertyType), null);
+                        p.SetValue(o, null);
+                    }
+                    else if (p.PropertyType == typeof(DateTime) && a is string s)
+                    {
+                        p.SetValue(o, ManagementDateTimeConverter.ToDateTime((string)a), null);
+                    }
+                    else if (a is ManagementBaseObject b)
+                    {
+                        var classAtt = p.PropertyType.GetCustomAttribute<WMIClass>();
+
+                        string className = String.Empty;
+
+                        if (classAtt != null)
+                        {
+                            className = classAtt.Name;
+                        }
+                        else
+                        {
+                            className = p.PropertyType.Name;
+                        }
+
+                        if (className == b.ClassPath.ClassName)
+                        {
+                            p.SetValue(o, LoadObject(b, p.PropertyType), null);
+                        }
+                    }
+                    else
+                    {
+                        var propertyType = p.PropertyType;
+                        if (propertyType.IsGenericType &&
+                            propertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+                        {
+                            propertyType = propertyType.GetGenericArguments()[0];
+                        }
+                        p.SetValue(o, Convert.ChangeType(a, propertyType), null);
                     }
                 }
-                else
+                catch (Exception ex)
                 {
-                    var propertyType = p.PropertyType;
-                    if (propertyType.IsGenericType &&
-                        propertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                    {
-                        propertyType = propertyType.GetGenericArguments()[0];
-                    }
-                    p.SetValue(o, Convert.ChangeType(a, propertyType), null);
+                    throw new Exception($"Property name was not found on WMI object. Check out {o} property names and attributes");
                 }
             }
             else
