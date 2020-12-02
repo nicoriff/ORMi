@@ -114,8 +114,8 @@ For adding, updating and deleting instances we are going to use a custom namespa
         [WMIProperty("PRIMARYSEGMENTID")]
         public int Segment { get; set; }
 
-		[WMIIgnore]
-		public string City { get; set; }
+        [WMIIgnore]
+        public string City { get; set; }
     }
  ```
    
@@ -218,6 +218,43 @@ Or you can just not define any Type to return and ORMi will return a dynamic obj
 ```C#
 	WMIWatcher watcher = new WMIWatcher("root\\CimV2", "SELECT * FROM Win32_ProcessStartTrace");
 	watcher.WMIEventArrived += Watcher_WMIEventArrived;
+```
+
+Since version 3.1.0 you can also inject `WMIWatcher` into your classes using Microsoft DI implementation. Just like you can do with `WMIHelper`:
+
+```C#
+    .ConfigureServices((hostContext, services) =>
+    {
+        services.AddHostedService<Worker>();
+        services.AddSingleton<IWMIWatcher, WMIWatcher>();
+    });
+```
+
+**NOTE**: If you inject `WMIWatcher` with the empty constructor you will have to call the `Initialize` method so you can correctly initialize `WMIWatcher` with the desired parameters. Otherwise it will not work
+
+```C#
+    public class Worker : BackgroundService
+    {
+        private readonly IWMIWatcher _watcher;
+
+        public Worker(IWMIHelper helper, IWMIWatcher watcher)
+        {
+            _watcher = watcher;
+        }
+
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            _watcher.Initialize("root\\CimV2", "SELECT * FROM Win32_ProcessStartTrace");
+            _watcher.WMIEventArrived += _watcher_WMIEventArrived;
+        }
+
+        private void _watcher_WMIEventArrived(object sender, WMIEventArgs e)
+        {
+            dynamic process = e.Object;
+
+            Console.WriteLine("New Process: {0} (Pid: {1})", process.ProcessName, process.ProcessID.ToString());
+        }
+    }
 ```
 
 ## Methods
