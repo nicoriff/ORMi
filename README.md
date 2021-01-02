@@ -1,6 +1,6 @@
 # ORMi (Object Relational Management Instrumentation)
 
-ORMi is a quite simple Light-ORM to work with WMI (Windows Management Instrumentation). It handles WMI CRUD operations in a very easy way. ORMi does automatic mapping to model clases so you can easily work with WMI classes without having to worry about writing complex queries and handling WMI connections.
+ORMi (pronounced "*ormee*") is a quite simple Light-ORM to work with WMI (Windows Management Instrumentation). It handles WMI CRUD operations in a very easy way. ORMi does automatic mapping to model clases so you can easily work with WMI classes without having to worry about writing complex queries and handling WMI connections.
 
 ## Getting Started
 ![Nuget](https://img.shields.io/nuget/v/ORMi) ![Nuget](https://img.shields.io/nuget/dt/ORMi) ![GitHub release (latest by date)](https://img.shields.io/github/v/release/nicoriff/ORMi)

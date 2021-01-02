@@ -48,7 +48,7 @@ namespace ORMi
         /// <param name="options">Connection options. If null, default options are used</param>
         public WMIWatcher(string scope, Type type, ConnectionOptions options = null)
         {
-            Initialize(scope, String.Format("SELECT * FROM {0}", TypeHelper.GetClassName(type), type, options));
+            Initialize(scope, $"SELECT * FROM {TypeHelper.GetClassName(type)}", type, options);
         }
 
         /// <summary>
