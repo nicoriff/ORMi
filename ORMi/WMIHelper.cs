@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Management;
 using System.Reflection;
+using System.Security;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
@@ -87,6 +88,31 @@ namespace ORMi
                     Authentication = auth,
                     Username = username,
                     Password = password
+                }
+            };
+        }
+
+        /// <summary>
+        /// Creates a WMIHelper object targeting the desired scope on the specified hostname with specified credentials.
+        /// </summary>
+        /// <param name="scope">WMI namespace</param>
+        /// <param name="hostname">Client machine</param>
+        /// <param name="domain">User account domain that will make the WMI connection</param>
+        /// <param name="username">Username that will make the WMI connection</param>
+        /// <param name="password">The username´s password (SecureString)</param>
+        /// <param name="auth">Athentication level</param>
+        public WMIHelper(string scope, string hostname, string domain, string username, SecureString password, AuthenticationLevel auth = AuthenticationLevel.Default)
+        {
+            Scope = new ManagementScope(String.Format("\\\\{0}\\{1}", hostname, scope))
+            {
+                Options = new ConnectionOptions
+                {
+                    EnablePrivileges = true,
+                    Impersonation = ImpersonationLevel.Impersonate,
+                    Authentication = auth,
+                    Authority = $"ntlmdomain:{domain}",
+                    Username = username,
+                    SecurePassword = password
                 }
             };
         }
