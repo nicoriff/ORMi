@@ -325,9 +325,9 @@ namespace ORMi
         /// <param name="obj">Object to be updated</param>
         /// <param name="query">Query to be run. The resulting instances will be updated</param>
         /// <returns></returns>
-        public async Task UpdateInstanceAsync(object obj, string query)
+        public Task UpdateInstanceAsync(object obj, string query)
         {
-            await Task.Run(() => UpdateInstance(obj, query));
+            return Task.Run(() => UpdateInstance(obj, query));
         }
 
         /// <summary>
@@ -452,9 +452,9 @@ namespace ORMi
         /// </summary>
         /// <param name="query">Query that returns the objects to be removed</param>
         /// <returns></returns>
-        public async Task RemoveInstanceAsync(string query)
+        public Task RemoveInstanceAsync(string query)
         {
-            await Task.Run(() => RemoveInstance(query));
+            return Task.Run(() => RemoveInstance(query));
         }
 
         /// <summary>
@@ -486,9 +486,9 @@ namespace ORMi
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<dynamic>> QueryAsync(string query)
+        public Task<IEnumerable<dynamic>> QueryAsync(string query)
         {
-            return await Task.Run(() => Query(query));
+            return Task.Run(() => Query(query));
         }
 
         /// <summary>
@@ -524,9 +524,9 @@ namespace ORMi
         /// </summary>
         /// <typeparam name="T">The Type of IEnumerable that will be returned</typeparam>
         /// <returns></returns>
-        public async Task<IEnumerable<T>> QueryAsync<T>()
+        public Task<IEnumerable<T>> QueryAsync<T>()
         {
-            return await Task.Run(() => Query<T>());
+            return Task.Run(() => Query<T>());
         }
 
         /// <summary>
@@ -560,9 +560,9 @@ namespace ORMi
         /// <typeparam name="T">The Type of IEnumerable that will be returned</typeparam>
         /// <param name="query">Query to be run against WMI</param>
         /// <returns></returns>
-        public async Task<IEnumerable<T>> QueryAsync<T>(string query)
+        public Task<IEnumerable<T>> QueryAsync<T>(string query)
         {
-            return await Task.Run(() => Query<T>(query));
+            return Task.Run(() => Query<T>(query));
         }
 
         /// <summary>
@@ -594,9 +594,9 @@ namespace ORMi
         /// </summary>
         /// <param name="query">Query to be run</param>
         /// <returns></returns>
-        public async Task<dynamic> QueryFirstOrDefaultAsync(string query)
+        public Task<dynamic> QueryFirstOrDefaultAsync(string query)
         {
-            return await Task.Run(() => QueryFirstOrDefault(query));
+            return Task.Run(() => QueryFirstOrDefault(query));
         }
 
         /// <summary>
@@ -632,9 +632,9 @@ namespace ORMi
         /// </summary>
         /// <typeparam name="T">The Type of object that will be returned</typeparam>
         /// <returns></returns>
-        public async Task<T> QueryFirstOrDefaultAsync<T>()
+        public Task<T> QueryFirstOrDefaultAsync<T>()
         {
-            return await Task.Run(() => QueryFirstOrDefault<T>());
+            return Task.Run(() => QueryFirstOrDefault<T>());
         }
 
         /// <summary>
@@ -668,9 +668,9 @@ namespace ORMi
         /// <typeparam name="T"></typeparam>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<T> QueryFirstOrDefaultAsync<T>(string query)
+        public Task<T> QueryFirstOrDefaultAsync<T>(string query)
         {
-            return await Task.Run(() => QueryFirstOrDefault<T>(query));
+            return Task.Run(() => QueryFirstOrDefault<T>(query));
         }
 
         /// <summary>
@@ -706,9 +706,9 @@ namespace ORMi
         /// </summary>
         /// <param name="instances">List of objects containing all the instances to insert</param>
         /// <returns></returns>
-        public async Task BulkInsertAsync(List<object> instances)
+        public Task BulkInsertAsync(List<object> instances)
         {
-            await Task.Run(() => BulkInsert(instances));
+            return Task.Run(() => BulkInsert(instances));
         }
 
         /// <summary>
@@ -745,9 +745,9 @@ namespace ORMi
         /// </summary>
         /// <param name="instances">List of objects containing all the instances to update</param>
         /// <returns></returns>
-        public async Task BulkUpdateAsync(List<object> instances)
+        public Task BulkUpdateAsync(List<object> instances)
         {
-            await Task.Run(() => BulkUpdate(instances));
+            return Task.Run(() => BulkUpdate(instances));
         }
 
 
