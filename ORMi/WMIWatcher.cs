@@ -102,14 +102,12 @@ namespace ORMi
             if (_type != null)
             {
                 object o = TypeHelper.LoadObject(e.NewEvent, _type);
-
-                WMIEventArrived(this, new WMIEventArgs { Object = o });
+                WMIEventArrived?.Invoke(this, new WMIEventArgs { Object = o });
             }
             else
             {
                 dynamic d = TypeHelper.LoadDynamicObject(e.NewEvent);
-
-                WMIEventArrived(this, new WMIEventArgs { Object = d });
+                WMIEventArrived?.Invoke(this, new WMIEventArgs { Object = d });
             }
         }
 
