@@ -20,10 +20,11 @@ namespace ORMi.Sample.Worker
             _watcher = watcher;
         }
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _watcher.Initialize("root\\CimV2", "SELECT * FROM Win32_ProcessStartTrace");
             _watcher.WMIEventArrived += _watcher_WMIEventArrived;
+            return Task.CompletedTask;
         }
 
         private void _watcher_WMIEventArrived(object sender, WMIEventArgs e)
